@@ -324,7 +324,7 @@ public class Node
         m_label.add(str);
     }
     
-    /** Sets the PL proprety to the given color. */
+    /** Sets the PL property to the given color. */
     public void setPlayerToMove(HexColor color)
     {
         setSgfProperty("PL", (color == HexColor.BLACK) ? "B" : "W");

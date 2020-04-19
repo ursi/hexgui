@@ -230,7 +230,7 @@ public final class GuiBoard
     }
 
     /** Creates a board with the given dimensions.
-	Convience function.  
+	Convenience function.  
 	@param dim dimension of the board
 	@see initSize(int, int)
     */
@@ -309,7 +309,7 @@ public final class GuiBoard
         repaint();
     }
 
-    /** Clears dynamnic marks, leaving stones intact. If the dirty flag is set,
+    /** Clears dynamic marks, leaving stones intact. If the dirty flag is set,
         revert the fields to the saved fields saved in markStonesDirty().
         Dirty stones flag is set to false. See aboutToDirtyStones().
         Empties the list of arrows. 
@@ -411,7 +411,7 @@ public final class GuiBoard
         repaint();
     }
 
-    /** Sets the given points's alpha color. */
+    /** Sets the given point's alpha color. */
     public void setAlphaColor(HexPoint point, Color color)
     {
         if (point == HexPoint.get("swap-pieces"))
@@ -432,7 +432,7 @@ public final class GuiBoard
         repaint();
     }
 
-    /** Returns the points's alpha color; null if it is 'swap-pieces'
+    /** Returns the point's alpha color; null if it is 'swap-pieces'
         or resign. */
     public Color getAlphaColor(HexPoint point)
     {
@@ -444,14 +444,14 @@ public final class GuiBoard
 	return getField(point).getAlphaColor();
     }
     
-    /** Sets the given points's text. */
+    /** Sets the given point's text. */
     public void setText(HexPoint point, String str)
     {
         getField(point).setText(str);
         repaint();
     }
 
-    /** Sets wheither this cell is selected. */
+    /** Sets whether this cell is selected. */
     public void setSelected(HexPoint point, boolean selected)
     {
         getField(point).setSelected(selected);

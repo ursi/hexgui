@@ -33,7 +33,7 @@ public class Options
 
     /** Return string option value.
         @param option The option key.
-        @return The option value or en empty string, if option is not
+        @return The option value or an empty string, if option is not
         present. */
     public String get(String option)
     {

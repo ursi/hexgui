@@ -30,7 +30,7 @@ public final class FileUtil
         Can be used instead of URI.relativize(), which  does not compute
         relative URI's correctly, if toFile is not a subdirectory of fromFile
         (Sun's Java 1.5.0).
-        @todo Handle special charcters and file names containing slashes.
+        @todo Handle special characters and file names containing slashes.
         @param fromFile File to compute the URI relative to.
         @param toFile Target file or directory.
         @return Relative URI. */

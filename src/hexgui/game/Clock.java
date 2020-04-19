@@ -53,7 +53,7 @@ public class Clock
         m_startTime = -1;
     }
 
-    /** Returns elapsed time in miliseconds. */
+    /** Returns elapsed time in milliseconds. */
     public int elapsed()
     {
         if (m_startTime == -1)

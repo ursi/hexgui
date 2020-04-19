@@ -171,7 +171,7 @@ public class HtpController
 	return ret.toString();
     }
 
-    /** Cleans the input.  Removes all occurances of '\r'. 
+    /** Cleans the input.  Removes all occurrences of '\r'. 
 	Converts all '\t' to ' '. 
     */
     private String cleanInput(String in)

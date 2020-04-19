@@ -54,7 +54,7 @@ public final class SgfReader
 	    m_reader.close();
 	}
 	catch (IOException e) {
-	    throw sgfError("IO error occured while parsing file.");
+	    throw sgfError("IO error occurred while parsing file.");
 	}
     }
 

@@ -54,7 +54,7 @@ public final class AnalyzeUtil
         }
         catch (NoSuchElementException e)
         {
-            // Treat unknown types as string for compatibiliy with future
+            // Treat unknown types as string for compatibility with future
             // types
             result.m_typeInfo = "string";
         }
@@ -74,7 +74,7 @@ public final class AnalyzeUtil
         else if (result.m_typeInfo.startsWith("list/"))
             result.m_type = ParameterType.LIST;
         else
-            // Treat unknown types as string for compatibiliy with future
+            // Treat unknown types as string for compatibility with future
             // types
             result.m_type = ParameterType.STRING;
         return result;

@@ -98,7 +98,7 @@ public class Platform
         return s_isWindows;
     }
 
-    /** Try to open a URL in en external browser.
+    /** Try to open a URL in an external browser.
         Tries /usr/bin/open if Platform.isMac(),
         rundll32 url.dll,FileProtocolHandler if Platform.isWindows(),
         and if isUnix() in this order:

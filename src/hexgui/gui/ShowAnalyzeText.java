@@ -1,4 +1,4 @@
-// ShowAnalyeText.java
+// ShowAnalyzeText.java
 
 package hexgui.gui;
 

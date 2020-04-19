@@ -13,7 +13,7 @@ public final class Hexagon
 {
 
     /** Creates a hexagon with flat sides centered at the specified point.
-	@param p center of hexagaon.
+	@param p center of hexagon.
 	@param width the width of the hexagon.
 	@param height the height of the hexagon.
 	@return an instance of Polygon with the above properties.
@@ -43,7 +43,7 @@ public final class Hexagon
 
     /** Creates a hexagon with flat top and bottom centered at 
 	the specified point.
-	@param p center of hexagaon.
+	@param p center of hexagon.
 	@param width the width of the hexagon.
 	@param height the height of the hexagon.
 	@return an instance of Polygon with the above properties.

@@ -160,7 +160,7 @@ public abstract class BoardDrawerBase
     */
     protected abstract int calcBoardHeight();
 
-    /** Perfroms any necessary initializations for drawing the
+    /** Performs any necessary initializations for drawing the
 	outlines of the fields.
 	@param the fields it will need to draw
     */

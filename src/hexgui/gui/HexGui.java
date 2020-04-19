@@ -1010,7 +1010,7 @@ public final class HexGui
                 }
                 catch(InterruptedException e)
                 {
-                    System.out.println("INTERUPTED! HUH?");
+                    System.out.println("INTERRUPTED! HUH?");
                 }
 
                 if (m_white != null && m_white.connected()) 

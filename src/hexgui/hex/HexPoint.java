@@ -87,7 +87,7 @@ public final class HexPoint implements Comparable
 	return s_points[7 + y*MAX_WIDTH + x];
     }
     
-    /** Returns the point with the given string represention.
+    /** Returns the point with the given string representation.
 	Valid special moves include: "north", "south", "east", "west" 
 	"swap-sides", "swap-pieces", "resign", and "forfeit". 
 	@param name The name of the point to return

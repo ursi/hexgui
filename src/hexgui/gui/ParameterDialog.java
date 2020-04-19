@@ -339,7 +339,7 @@ public class ParameterDialog
                                                  result.m_key,
                                                  result.m_value));
             else
-                // Treat unknown types as string for compatibiliy with future
+                // Treat unknown types as string for compatibility with future
                 // types
                 parameters.add(new StringParameter(result.m_key,
                                                    result.m_value));

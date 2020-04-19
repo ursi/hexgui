@@ -198,7 +198,7 @@ public final class StringUtils
 
             }
             catch(Throwable t) {
-                System.out.println("Exception occured while parsing VC: '" +
+                System.out.println("Exception occurred while parsing VC: '" +
                                    t.getMessage() + "'");
                 return ret;                
             }
