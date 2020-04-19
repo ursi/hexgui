@@ -29,6 +29,8 @@ public class Comment
         m_listener = listener;
         m_textPane = new JTextArea();
         m_textPane.setFont(MONOSPACED_FONT);
+        m_textPane.setLineWrap(true);
+        m_textPane.setWrapStyleWord(true);
         setViewportView(m_textPane);
         setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         m_textPane.getDocument().addDocumentListener(this);
