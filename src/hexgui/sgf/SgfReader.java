@@ -20,7 +20,8 @@ import java.util.*;
 //----------------------------------------------------------------------------
 
 /** SGF reader. 
-    NOTE: Uses StringBuilder which requires Java 1.5
+    See https://www.red-bean.com/sgf/ for the SGF definition.
+    NOTE: Uses StringBuilder which requires Java 1.5.
 */
 public final class SgfReader
 {
@@ -76,6 +77,7 @@ public final class SgfReader
 
     //------------------------------------------------------------
 
+    /** Fast forward to the first "(". */
     private void findGameTree() throws SgfError, IOException
     {
 	while (true) {
@@ -278,6 +280,7 @@ public final class SgfReader
         }
     }
 
+    // Parse an SGF "SimpleText" property value.
     private String parseValue() throws SgfError, IOException
     {
 	int ttype = m_tokenizer.nextToken();
@@ -287,27 +290,47 @@ public final class SgfReader
 	StringBuilder sb = new StringBuilder(256);
 	boolean quoted = false;
 	while (true) {
-	    int c = m_reader.read();
-	    if (c < 0)
+	    int ch = m_reader.read();
+	    if (ch < 0) {
 		throw sgfError("Property runs to EOF.");
-
+            }
+            // Don't rely on the default conversion, because
+            // sb.append(ch) would convert the integer to a string
+            // rather than a character.
+            char c = (char)ch;
+            
 	    if (!quoted) {
-		if (c == ']') break;
-		if (c == '\\') 
+		if (c == ']') {
+                    break;
+                }
+		if (c == '\\') {
 		    quoted = true;
-		else {
-		    if (c != '\r' && c != '\n')
-			sb.append((char)c);
+                } else {
+		    if (Character.isWhitespace(c)) {
+                        // The spec says "Whitespaces other than space
+                        // must be converted to space".
+                        sb.append(' ');
+                    } else {
+			sb.append(c);
+                    }
 		}
 	    } else {
 		quoted = false;
-		sb.append(c);
+                if (Character.isWhitespace(c)) {
+                    // The spec says "Any char following "\" is
+                    // inserted verbatim (exception: whitespaces still
+                    // have to be converted to space!)."
+                    sb.append(' ');
+                } else {
+                    sb.append(c);
+                }
 	    }
 	}
 
 	return sb.toString();
     }
 
+    // Parse an SGF "Text" property value.
     private String parseComment() throws SgfError, IOException
     {
 	int ttype = m_tokenizer.nextToken();
@@ -317,21 +340,49 @@ public final class SgfReader
 	StringBuilder sb = new StringBuilder(4096);
 	boolean quoted = false;
 	while (true) {
-	    int c = m_reader.read();
-	    if (c < 0)
+	    int ch = m_reader.read();
+	    if (ch < 0) {
 		throw sgfError("Comment runs to EOF.");
-
+            }
+            char c = (char)ch;
+            
 	    if (!quoted) {
-		if (c == ']') break;
+		if (c == ']') {
+                    break;
+                }
 
-		if (c == '\\') 
+		if (c == '\\') {
 		    quoted = true;
-		else {
-                    sb.append((char)c);
+		} else {
+                    if (Character.isWhitespace(c) && c == '\n') {
+                        // The spec says "White spaces other than
+                        // linebreaks are converted to space (e.g. no
+                        // tab, vertical tab, ..)."
+
+                        // Also note that the LineNumberReader class
+                        // already takes care of newline conversion,
+                        // i.e., "\n", "\r", and "\r\n" are all
+                        // converted to '\n'.
+                        sb.append(' ');
+                    } else {
+                        sb.append(c);
+                    }
 		}
 	    } else {
 		quoted = false;
-		sb.append(c);
+                if (c == '\n') {
+                    // Append nothing. The spec says: "Soft line
+                    // break: linebreaks preceded by a "\" (soft
+                    // linebreaks are converted to "", i.e. they are
+                    // removed)".
+                } else if (Character.isWhitespace(c)) {
+                    // The spec says: "Any char following "\" is
+                    // inserted verbatim (exception: whitespaces still
+                    // have to be converted to space!).
+                    sb.append(' ');
+                } else {
+                    sb.append(c);
+                }
 	    }
 	}
 

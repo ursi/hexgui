@@ -19,7 +19,9 @@ import java.util.Vector;
 
 //----------------------------------------------------------------------------
 
-/** SGF Writer. */
+/** SGF Writer. 
+    See https://www.red-bean.com/sgf/ for the SGF definition.
+*/
 public final class SgfWriter
 {
     
@@ -89,8 +91,16 @@ public final class SgfWriter
 	Iterator<Map.Entry<String,String> >  it = map.entrySet().iterator();
 	while(it.hasNext()) {
 	    Map.Entry<String,String> e = it.next();
-            if (!(e.getKey().equals("C") && e.getValue().equals("")))
-                print(e.getKey() + "[" + e.getValue() + "]");
+            if (!(e.getKey().equals("C") && e.getValue().equals(""))) {
+                String val = e.getValue();
+                if (e.getKey().equals("C")) {
+                    // For now we only escape comments, although there
+                    // may be other text values that should be escaped
+                    // too. Avoids escaping the ":" in AP field.
+                    val = escapeString(val);
+                }
+                print(e.getKey() + "[" + val + "]");
+            }
 	}
 	
 	int num = node.numChildren();
@@ -105,6 +115,27 @@ public final class SgfWriter
 	    writeTree(node.getChild(i), false);
     }
 
+    private String escapeString(String s)
+    {
+        StringBuilder out = new StringBuilder(256);
+        for (int i=0; i<s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+            case '\\':
+            case '[':
+            case ']':
+            case ':':
+                out.append('\\');
+                out.append(c);
+                break;
+            default:
+                out.append(c);
+            }
+            
+        }
+        return out.toString();
+    }
+    
     private void printMove(Move move)
     {
 	String color = "B";
