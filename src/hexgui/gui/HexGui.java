@@ -2345,6 +2345,7 @@ public final class HexGui
     public void commentChanged(String string)
     {
         m_current.setComment(string);
+        setGameChanged(true);
     }
 
     private boolean checkBoardSizeSupported()
