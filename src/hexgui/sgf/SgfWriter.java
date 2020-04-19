@@ -111,8 +111,9 @@ public final class SgfWriter
 	    return;
 	} 
 	
-	for (int i=0; i<num; i++) 
+	for (int i=0; i<num; i++) {
 	    writeTree(node.getChild(i), false);
+        }
     }
 
     private String escapeString(String s)

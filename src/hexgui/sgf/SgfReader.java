@@ -213,17 +213,20 @@ public final class SgfReader
         while(!done) {
 
 	    int ttype = m_tokenizer.nextToken();
-            if (ttype != '[') 
+            if (ttype != '[') {
                 done = true;
+            }
             m_tokenizer.pushBack();
-            if (done) 
+            if (done) {
                 break;
+            }
 
             String val;
-            if (name.equals("C"))
+            if (name.equals("C")) {
                 val = parseComment();
-            else
+            } else {
                 val = parseValue();
+            }
             //System.out.println(name + "[" + val + "]");
 	
             if (name.equals("W")) {
@@ -284,8 +287,9 @@ public final class SgfReader
     private String parseValue() throws SgfError, IOException
     {
 	int ttype = m_tokenizer.nextToken();
-	if (ttype != '[')
+	if (ttype != '[') {
 	    throw sgfError("Property missing opening '['.");
+        }
 
 	StringBuilder sb = new StringBuilder(256);
 	boolean quoted = false;
@@ -334,9 +338,10 @@ public final class SgfReader
     private String parseComment() throws SgfError, IOException
     {
 	int ttype = m_tokenizer.nextToken();
-	if (ttype != '[')
+	if (ttype != '[') {
 	    throw sgfError("Comment missing opening '['.");
-
+        }
+        
 	StringBuilder sb = new StringBuilder(4096);
 	boolean quoted = false;
 	while (true) {
@@ -405,8 +410,9 @@ public final class SgfReader
 
     private void verifyGame(Node root) throws SgfError
     {
-	if (m_gameinfo.getBoardSize()==null)
+	if (m_gameinfo.getBoardSize()==null) {
 	    throw sgfError("Missing SZ property.");
+        }
     }
 
     private SgfError sgfError(String msg)
