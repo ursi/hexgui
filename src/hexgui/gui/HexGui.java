@@ -137,9 +137,14 @@ public final class HexGui
         } else if (cmd.equals("newgame")) {
 	    cmdNewGame();
         } else if (cmd.equals("savegame")) {
-	    if (gameChanged()) {
-                cmdSaveGame();
-            }
+            // We previously only saved when gameChanged() == true,
+            // but this is dangerous because saving would fail
+            // silently otherwise. It's better to simply save the game
+            // when the user asks for it. An alternative use for
+            // gameChanged() would be to disable the save button when
+            // we think the game hasn't changed. But we shouldn't just
+            // offer a button and then do nothing.
+            cmdSaveGame();
         } else if (cmd.equals("savegameas")) {
 	    cmdSaveGameAs();
         } else if (cmd.equals("loadgame")) {
