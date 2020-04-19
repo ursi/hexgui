@@ -8,6 +8,7 @@ import hexgui.hex.HexColor;
 import hexgui.hex.HexPoint;
 import hexgui.hex.Move;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -31,9 +32,7 @@ public class Node
     public Node(Move move)
     {
 	m_property = new TreeMap<String, String>();
-        m_setup_black = new Vector<HexPoint>();
-        m_setup_white = new Vector<HexPoint>();
-        m_setup_empty = new Vector<HexPoint>();
+        m_setup = new TreeMap<HexPoint,HexColor>();
         m_label = new Vector<String>();
         m_recent = false;
 	setMove(move);
@@ -264,49 +263,34 @@ public class Node
         property string. */
     public void addSetup(HexColor color, HexPoint point)
     {
-        if (color == HexColor.BLACK) {
-            if (!m_setup_black.contains(point)) {
-                m_setup_black.add(point);
-            }
-        } else if (color == HexColor.WHITE) {
-            if (!m_setup_white.contains(point)) {
-                m_setup_white.add(point);
-            }
-        } else if (color == HexColor.EMPTY) {
-            if (!m_setup_empty.contains(point)) {
-                m_setup_empty.add(point);
-            }
-        } 
+        m_setup.put(point, color);
     }
 
     public void removeSetup(HexColor color, HexPoint point)
     {
-        if (color == HexColor.BLACK) {
-            m_setup_black.remove(point);
-        } else if (color == HexColor.WHITE) {
-            m_setup_white.remove(point);
-        } else if (color == HexColor.EMPTY) {
-            m_setup_empty.remove(point);
-        }
+        m_setup.remove(point);
     }
     
     /** Returns the set of setup stones of color. */
     public Vector<HexPoint> getSetup(HexColor color) 
     {
-        if (color == HexColor.BLACK)
-            return m_setup_black;
-        if (color == HexColor.WHITE)
-            return m_setup_white;
-        if (color == HexColor.EMPTY)
-            return m_setup_empty;
-        return null;
+        Vector<HexPoint> points = new Vector<HexPoint>();
+        HexPoint key;
+        Iterator i = m_setup.keySet().iterator();
+        
+        while (i.hasNext()) {
+            key = (HexPoint)i.next();
+            if (m_setup.get(key) == color) {
+                points.add(key);
+            }
+        }
+
+        return points;
     }
 
     public boolean hasSetup()
     {
-        return (!m_setup_black.isEmpty() ||
-                !m_setup_white.isEmpty() || 
-                !m_setup_empty.isEmpty());
+        return !m_setup.isEmpty();
     }
     
     public boolean hasLabel()
@@ -345,9 +329,7 @@ public class Node
 
     private TreeMap<String,String> m_property;
 
-    private Vector<HexPoint> m_setup_black;
-    private Vector<HexPoint> m_setup_white;
-    private Vector<HexPoint> m_setup_empty;
+    private Map<HexPoint,HexColor> m_setup;
 
     private Vector<String> m_label;
 
