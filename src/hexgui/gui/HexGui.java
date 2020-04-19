@@ -1877,7 +1877,6 @@ public final class HexGui
         
         // and set the color to play next
         m_tomove = move.getColor();
-        m_toolbar.setToMove(m_tomove.toString());
 
         m_guiboard.setColor(move.getPoint(), move.getColor());
         m_guiboard.paintImmediately();
