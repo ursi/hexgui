@@ -2092,9 +2092,6 @@ public final class HexGui
 
             undoNode(m_current);
 	    m_current = m_current.getParent();
-            if (m_current.hasSetup()) {
-                playSetup(m_current);
-            }
 	}
         stopClock();
         refreshGuiForBoardState();
