@@ -561,20 +561,53 @@ public final class HexGui
 
 	htpBoardsize(m_guiboard.getBoardSize());
 
-        // play up to current move
-	Node cur = m_root;
-	while (cur != m_current)
-        {
-	    cur = cur.getChildContainingNode(m_current);
-            if (cur.hasMove())
-                htpPlay(cur.getMove());
-            if (cur.hasSetup()) {
-                playSetup(cur);
-            }
-	}
+        // Replay all moves up to the current node. 
+        replayUpToNode(m_current);
         htpShowboard();
     }
 
+    // Replay all moves up to the given node. Do this without changing
+    // the current node.
+    private void replayUpToNode(Node node)
+    {
+        Vector<Node> path = new Vector<Node>();
+        while (node != null) {
+            path.add(node);
+            node = node.getParent();
+        }
+        m_guiboard.clearAll();
+        htpClearBoard();
+        for (int i = path.size()-1; i>=0; i--) {
+            node = path.elementAt(i);
+            if (node.hasMove()) {
+                guiPlay(node.getMove());
+                htpPlay(node.getMove());
+            }
+            if (node.hasSetup()) {
+                playSetup(node);
+            }
+        }
+    }
+
+    /** Run HTP commands to set up the current board position from
+        scratch. This may be necessary when a setup move removes a
+        piece, or changes the color of an existing piece, as there is
+        no valid HTP command to do so. */
+    private void htpSetUpCurrentBoard()
+    {
+        htpClearBoard();
+        Dimension size = m_guiboard.getBoardSize();
+        for (int y = 0; y < size.height; y++) {
+            for (int x = 0; x < size.width; x++) {
+                HexPoint point = HexPoint.get(x, y);
+                HexColor c = m_guiboard.getColor(point);
+                if (c == HexColor.BLACK || c == HexColor.WHITE) {
+                    htpPlay(new Move(point, c));
+                }
+            }
+        }
+    }
+    
     private void cmdDisconnectProgram()
     {
 	if (m_white == null)
@@ -1085,11 +1118,20 @@ public final class HexGui
 	sendCommand("hexgui-analyze_commands\n", cb);
     }
 
+    private void htpClearBoard()
+    {
+        sendCommand("clear_board\n", null);
+    }
+    
     private void htpShowboard()
     {
         sendCommand("showboard\n", null);
     }
 
+    /** Play a move on the attached HTP backend. This only works if
+     * move is a legal move of color black or white. There is no HTP
+     * command for setup moves that remove a piece, or that change the
+     * color of an already existing piece. */
     private void htpPlay(Move move)
     {
 	sendCommand("play " + move.getColor().toString() +
@@ -1737,15 +1779,17 @@ public final class HexGui
             }
             else if (context.equals("black"))
             {
-                if (m_guiboard.getColor(point) == HexColor.EMPTY)
-                {
+                if (m_guiboard.getColor(point) == HexColor.BLACK) {
+                    addSetupMove(new Move(point, HexColor.EMPTY));
+                } else {
                     addSetupMove(new Move(point, HexColor.BLACK));
                 }
             }
             else if (context.equals("white"))
             {
-                if (m_guiboard.getColor(point) == HexColor.EMPTY)
-                {
+                if (m_guiboard.getColor(point) == HexColor.WHITE) {
+                    addSetupMove(new Move(point, HexColor.EMPTY));
+                } else {
                     addSetupMove(new Move(point, HexColor.WHITE));
                 }
             }
@@ -1775,6 +1819,20 @@ public final class HexGui
             && m_preferences.getBoolean("auto-respond")
             && m_program != null)
             htpGenMove(m_tomove);
+    }
+
+    /** Update the GUI to reflect the given move. Do this without any
+     * changes to the game tree or the HTP. */
+    private void guiPlay(Move move)
+    {
+        if (m_guiboard.isYBoard() && move.getPoint() == HexPoint.SWAP_PIECES)
+            m_guiboard.swapColors();
+        else
+            m_guiboard.setColor(move.getPoint(),
+                                move.getColor());
+        
+        m_guiboard.clearMarks();
+	markLastPlayedStone();
     }
 
     private void play(Move move)
@@ -1833,14 +1891,7 @@ public final class HexGui
             cmdToggleToMove();
         startClock(m_tomove);
 
-        if (m_guiboard.isYBoard() && move.getPoint() == HexPoint.SWAP_PIECES)
-            m_guiboard.swapColors();
-        else
-            m_guiboard.setColor(m_current.getMove().getPoint(),
-                                m_current.getMove().getColor());
-
-        m_guiboard.clearMarks();
-	markLastPlayedStone();
+        guiPlay(move);
 	m_toolbar.updateButtonStates(m_current);
         m_menubar.updateMenuStates(m_current);
         m_statusbar.setMessage(m_current.getDepth() + " " 
@@ -1873,15 +1924,13 @@ public final class HexGui
 
         // add the setup stone to the set of setup stones
         m_current.addSetup(move.getColor(), move.getPoint());
-        m_current.setPlayerToMove(move.getColor());
+        m_current.setPlayerToMove(m_tomove);
         
-        // and set the color to play next
-        m_tomove = move.getColor();
-
         m_guiboard.setColor(move.getPoint(), move.getColor());
         m_guiboard.paintImmediately();
 
-        htpPlay(move);
+        htpSetUpCurrentBoard();
+        htpShowboard();
 
         m_statusbar.setMessage("Added setup stone (" + move.getColor().toString() +
                                ", " + move.getPoint().toString() + ")");
@@ -1904,40 +1953,37 @@ public final class HexGui
         }
     }
 
+    // Play the setup moves of the given node.
     private void playSetup(Node node)
     {
         Vector<HexPoint> black = node.getSetup(HexColor.BLACK);
         Vector<HexPoint> white = node.getSetup(HexColor.WHITE);
+        Vector<HexPoint> empty = node.getSetup(HexColor.EMPTY);
         for (int j=0; j<black.size(); j++)
         {
             HexPoint point = black.get(j);
             m_guiboard.setColor(point, HexColor.BLACK);
-            htpPlay(new Move(point, HexColor.BLACK));
         }
         for (int j=0; j<white.size(); j++)
         {
             HexPoint point = white.get(j);
             m_guiboard.setColor(point, HexColor.WHITE);
-            htpPlay(new Move(point, HexColor.WHITE));
         }
+        for (int j=0; j<empty.size(); j++)
+        {
+            HexPoint point = empty.get(j);
+            m_guiboard.setColor(point, HexColor.EMPTY);
+        }
+        htpSetUpCurrentBoard();
     }
 
+    // Undo the setup moves of the given node. Since the setup moves
+    // don't contain enough information to know the previous state
+    // (they can involve deleting pieces or recoloring pieces), we do
+    // this by replaying all moves up to the node's parent.
     private void undoSetup(Node node)
     {
-        Vector<HexPoint> black = node.getSetup(HexColor.BLACK);
-        Vector<HexPoint> white = node.getSetup(HexColor.WHITE);
-        for (int j=0; j<black.size(); j++)
-        {
-            HexPoint point = black.get(j);
-            m_guiboard.setColor(point, HexColor.EMPTY);
-            htpUndo();
-        }
-        for (int j=0; j<white.size(); j++)
-        {
-            HexPoint point = white.get(j);
-            m_guiboard.setColor(point, HexColor.EMPTY);
-            htpUndo();
-        }
+        replayUpToNode(node.getParent());
     }
 
     private void playNode(Node node)
@@ -2046,8 +2092,9 @@ public final class HexGui
 
             undoNode(m_current);
 	    m_current = m_current.getParent();
-            if (m_current.hasSetup())
+            if (m_current.hasSetup()) {
                 playSetup(m_current);
+            }
 	}
         stopClock();
         refreshGuiForBoardState();
