@@ -1993,12 +1993,16 @@ public final class HexGui
 	m_toolbar.updateButtonStates(m_current);
         m_menubar.updateMenuStates(m_current);
         setComment(m_current);
-        if (m_current.hasMove())
-        {
+        if (m_current.hasMove()) {
             Move move = m_current.getMove();
             m_statusbar.setMessage(m_current.getDepth() + " " 
                                    + move.getColor().toString() + " " 
                                    + move.getPoint().toString());
+        } else if (m_current.hasSetup()) {
+            m_statusbar.setMessage(m_current.getDepth() + " "
+                                   + "setup");
+        } else {
+            m_statusbar.setMessage(m_current.getDepth() + "");
         }
         if (m_current.hasLabel())
             displayLabels(m_current);
