@@ -42,7 +42,8 @@ public final class Move
     }
 
     /** Returns the color of the move.
-	@return HexColor of the move (WHITE or BLACK).
+	@return HexColor of the move (WHITE or BLACK or, in case of a
+	setup move, sometimes EMPTY).
     */
     public HexColor getColor()
     {
