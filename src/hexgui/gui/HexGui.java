@@ -1798,6 +1798,7 @@ public final class HexGui
 
     public void fieldDoubleClicked(HexPoint point, boolean ctrl, boolean shift)
     {
+        fieldClicked(point, ctrl, shift);
     }
 
     public Vector<HexPoint> getSelectedCells()
