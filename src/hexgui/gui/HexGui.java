@@ -135,6 +135,7 @@ public final class HexGui
 	// file/help commands
 	//
         } else if (cmd.equals("newgame")) {
+            end_setup();
 	    cmdNewGame();
         } else if (cmd.equals("savegame")) {
             // We previously only saved when gameChanged() == true,
@@ -2459,6 +2460,7 @@ public final class HexGui
 	    setFrameTitle();
 
 	    m_preferences.put("path-load-game", file.getPath());
+            end_setup();
 	}
     }
 
