@@ -711,6 +711,8 @@ public final class HexGui
 
             htpBoardsize(m_guiboard.getBoardSize());
             htpShowboard();
+
+            setCursorType();
 	}
     }
 
