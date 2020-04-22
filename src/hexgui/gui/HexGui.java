@@ -279,6 +279,15 @@ public final class HexGui
     }
 
     //------------------------------------------------------------
+    /** Return true if keyboard shortcuts should be enabled. This
+     * should be the case unless the user is currently typing in the
+     * text area. */
+    public boolean shortcutsEnabled()
+    {
+        return !m_comment.m_textPane.isFocusOwner();
+    }
+    
+    //------------------------------------------------------------
     private void cmdShutdown()
     {
 	if (gameChanged() && !askSaveGame())

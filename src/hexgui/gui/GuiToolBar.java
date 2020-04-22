@@ -18,7 +18,7 @@ import java.net.URL;
 public final class GuiToolBar 
     implements ActionListener
 {
-    public GuiToolBar(ActionListener listener, GuiPreferences preferences)
+    public GuiToolBar(HexGui listener, GuiPreferences preferences)
     {
 	m_preferences = preferences;
 	m_listener = listener;
@@ -353,7 +353,9 @@ public final class GuiToolBar
             button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0), "key");
             Action action = new AbstractAction() {
                     public void actionPerformed(ActionEvent actionEvent) {
-                        button.doClick();
+                        if (m_listener.shortcutsEnabled()) {
+                            button.doClick();
+                        }
                     }
                 };
             button.getActionMap().put("key", action);
@@ -374,7 +376,9 @@ public final class GuiToolBar
             button.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0), "key");
             Action action = new AbstractAction() {
                     public void actionPerformed(ActionEvent actionEvent) {
-                        button.doClick();
+                        if (m_listener.shortcutsEnabled()) {
+                            button.doClick();
+                        }
                     }
                 };
             button.getActionMap().put("key", action);
@@ -435,7 +439,7 @@ public final class GuiToolBar
 
     private GuiPreferences m_preferences;
     private JToolBar m_toolBar;
-    private ActionListener m_listener;
+    private HexGui m_listener;
 
     private JButton m_new, m_load, m_save;
 
