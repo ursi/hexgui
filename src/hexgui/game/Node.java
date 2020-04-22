@@ -66,12 +66,27 @@ public class Node
 
         if (prev == null) { 
             // need to fix parent since we're first child
-	    if (getParent() != null) getParent().setFirstChild(next);
+	    if (getParent() != null) {
+                getParent().setFirstChild(next);
+            }
 	} else {
 	    prev.setNext(next);
         }
 
-        if (next != null) next.setPrev(prev);
+        if (next != null) {
+            next.setPrev(prev);
+        }
+    }
+
+    /** Moves this node to the end of its siblings. */
+    public void moveToEnd()
+    {
+        Node parent = getParent();
+        if (parent == null) {
+            return;
+        }
+        this.removeSelf();
+        parent.addChild(this);
     }
 
     /** Adds a child to the end of the list of children. 

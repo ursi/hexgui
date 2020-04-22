@@ -227,6 +227,11 @@ public final class GuiMenuBar
         item.setActionCommand("game_delete_branch");
         menu.add(item);
 
+        item = new JMenuItem("Make Main Branch");
+        item.addActionListener(m_listener);
+        item.setActionCommand("game_make_main_branch");
+        menu.add(item);
+
 	return menu;
     }
 

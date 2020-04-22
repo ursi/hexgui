@@ -211,6 +211,9 @@ public final class HexGui
         } else if (cmd.equals("game_delete_branch")) {
             end_setup();
             cmdDeleteBranch();
+        } else if (cmd.equals("game_make_main_branch")) {
+            end_setup();
+            cmdMoveBranchTop();
         } else if (cmd.equals("game_start_clock")) {
             startClock();
         } else if (cmd.equals("game_stop_clock")) {
@@ -2155,6 +2158,12 @@ public final class HexGui
         m_menubar.updateMenuStates(m_current);
     }
 
+    private void cmdMoveBranchTop()
+    {
+        m_current.moveToEnd();
+        refreshGuiForBoardState();
+    }
+    
     private void determineColorToMove()
     {
 	if (m_current == m_root)
