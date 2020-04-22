@@ -2160,7 +2160,7 @@ public final class HexGui
 
     private void cmdMoveBranchTop()
     {
-        m_current.moveToEnd();
+        m_current.makeMain();
         refreshGuiForBoardState();
     }
     

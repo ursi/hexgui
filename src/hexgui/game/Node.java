@@ -78,7 +78,7 @@ public class Node
         }
     }
 
-    /** Moves this node to the end of its siblings. */
+    /** Moves this node to the end of its sibling list. */
     public void moveToEnd()
     {
         Node parent = getParent();
@@ -87,6 +87,17 @@ public class Node
         }
         this.removeSelf();
         parent.addChild(this);
+    }
+
+    /** Moves this node and all of its parents to the end of their
+     * sibling lists */
+    public void makeMain()
+    {
+        Node node = this;
+        while (node != null) {
+            node.moveToEnd();
+            node = node.getParent();
+        }
     }
 
     /** Adds a child to the end of the list of children. 
