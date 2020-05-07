@@ -359,7 +359,7 @@ public final class SgfReader
 		if (c == '\\') {
 		    quoted = true;
 		} else {
-                    if (Character.isWhitespace(c) && c == '\n') {
+                    if (Character.isWhitespace(c) && c != '\n') {
                         // The spec says "White spaces other than
                         // linebreaks are converted to space (e.g. no
                         // tab, vertical tab, ..)."
