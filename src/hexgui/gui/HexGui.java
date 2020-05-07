@@ -2113,7 +2113,7 @@ public final class HexGui
         refreshGuiForBoardState();
     }
 
-    private void up()
+    private void down()
     {
 	if (m_current.getNext() != null)
         {
@@ -2127,7 +2127,7 @@ public final class HexGui
 	}
     }
 
-    private void down()
+    private void up()
     {
 	if (m_current.getPrev() != null)
         {

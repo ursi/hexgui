@@ -107,8 +107,8 @@ public final class GuiToolBar
 	m_forward10.setEnabled(node.getChild() != null);
 	m_end.setEnabled(node.getChild() != null);
 
-	m_up.setEnabled(node.getNext() != null);
-	m_down.setEnabled(node.getPrev() != null);
+	m_up.setEnabled(node.getPrev() != null);
+	m_down.setEnabled(node.getNext() != null);
 
         m_swap.setEnabled(node.isSwapAllowed());
     }

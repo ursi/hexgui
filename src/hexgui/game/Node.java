@@ -79,27 +79,42 @@ public class Node
     }
 
     /** Moves this node to the end of its sibling list. */
-    public void moveToEnd()
+    public void moveToFirst()
     {
         Node parent = getParent();
         if (parent == null) {
             return;
         }
         this.removeSelf();
-        parent.addChild(this);
+        parent.addFirstChild(this);
     }
 
-    /** Moves this node and all of its parents to the end of their
+    /** Moves this node and all of its parents to the start of their
      * sibling lists */
     public void makeMain()
     {
         Node node = this;
         while (node != null) {
-            node.moveToEnd();
+            node.moveToFirst();
             node = node.getParent();
         }
     }
 
+    /** Adds a child to the beginning of the list of children. 
+        @param child Node to be added to end of list.
+    */     
+    public void addFirstChild(Node child) 
+    {
+        Node oldfirst = m_child;
+        m_child = child;
+	child.setParent(this);
+	child.setPrev(null);
+        child.setNext(oldfirst);
+        if (oldfirst != null) {
+            oldfirst.setPrev(child);
+        }
+    }
+    
     /** Adds a child to the end of the list of children. 
         @param child Node to be added to end of list.
     */     
@@ -180,18 +195,21 @@ public class Node
     public Node getChild() { return getChild(0); }
 
     /** Returns the most recent child.
-	@return most recent child, or last child if no recent one, or
+	@return most recent child, or first child if no recent one, or
 	<code>null</code> if no children.
     */
     public Node getRecentChild() {
         Node cur = m_child;
+        if (cur == null) {
+            return null;
+        }
         for (int i=0; cur != null; i++) {
-            if (cur.isRecent() || cur.getNext() == null) {
+            if (cur.isRecent()) {
                 return cur;
             }
 	    cur = cur.getNext();
         }
-        return null;
+        return m_child;
     }
 
     /** Returns the child that contains <code>node</code> in its subtree. */
