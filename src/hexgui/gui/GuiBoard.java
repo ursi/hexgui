@@ -28,6 +28,7 @@ public final class GuiBoard
     /** Callback for clicks on a field. */
     public interface Listener
     {
+        void panelClicked();
 	void fieldClicked(HexPoint point, boolean ctrl, boolean shift);
         void fieldDoubleClicked(HexPoint point, boolean ctrl, boolean shift);
     }
@@ -64,6 +65,9 @@ public final class GuiBoard
 	{
 	    public void mouseClicked(MouseEvent e)
 	    {
+                // First inform the parent that we were clicked, to
+                // handle things like keyboard focus.
+                m_listener.panelClicked();
 		GuiField f = m_drawer.getFieldContaining(e.getPoint(), m_field);
 		if (f == null) return;
 

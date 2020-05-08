@@ -112,6 +112,8 @@ public final class HexGui
     {
 	String cmd = e.getActionCommand();
 
+        unFocus();
+        
 	//
 	// system commands
 	//
@@ -1729,6 +1731,21 @@ public final class HexGui
     }
 
     //------------------------------------------------------------
+
+    // Remove keyboard focus from all text components, so that
+    // keyboard shortcuts can work.
+    private void unFocus()
+    {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+    }
+
+    /** Callback from GuiBoard.
+	Handle a mouse click.
+    */
+    public void panelClicked()
+    {
+        unFocus();
+    }
 
     /** Callback from GuiBoard.
 	Handle a mouse click.
