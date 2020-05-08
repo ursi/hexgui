@@ -710,7 +710,7 @@ public final class HexGui
             setComment(m_current);
 
 	    m_file = null;
-	    setGameChanged(false);
+	    resetGameChanged();
 	    setFrameTitle();
 
 	    m_guiboard.initSize(dim.width, dim.height);
@@ -739,7 +739,7 @@ public final class HexGui
 	    System.out.println("Saving to file: " + m_file.getName());
 	    if (save(m_file))
             {
-		setGameChanged(false);
+		resetGameChanged();
 		setFrameTitle();
 		m_preferences.put("path-save-game", m_file.getPath());
 		return true;
@@ -1915,7 +1915,6 @@ public final class HexGui
                                + move.getPoint().toString());
         setComment(m_current);
 
-	setGameChanged(true);
 	setFrameTitle();
 
 	m_guiboard.paintImmediately();
@@ -1951,7 +1950,6 @@ public final class HexGui
         m_statusbar.setMessage("Added setup stone (" + move.getColor().toString() +
                                ", " + move.getPoint().toString() + ")");
 
-        setGameChanged(true);
         setFrameTitle();
     }
 
@@ -2223,14 +2221,25 @@ public final class HexGui
         }
     }
 
-    private void setGameChanged(boolean changed)
-    {
-	m_gameChanged = changed;
+    // Record a snapshot of the current game state. This can later be
+    // used to check if the game has changed or not.
+    private void resetGameChanged() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new SgfWriter(out, m_root, m_gameinfo);
+        
+        m_gameSnapshot = out.toString();
     }
 
     private boolean gameChanged()
     {
-	return m_gameChanged;
+        if (m_gameSnapshot == null) {
+            return false;
+        }
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new SgfWriter(out, m_root, m_gameinfo);
+
+	return !m_gameSnapshot.equals(out.toString());
     }
 
     private void setFrameTitle()
@@ -2419,7 +2428,6 @@ public final class HexGui
     public void commentChanged(String string)
     {
         m_current.setComment(string);
-        setGameChanged(true);
     }
 
     private boolean checkBoardSizeSupported()
@@ -2474,7 +2482,7 @@ public final class HexGui
 	    forward(1000);
 
 	    m_file = file;
-	    setGameChanged(false);
+	    resetGameChanged();
 	    setFrameTitle();
 
 	    m_preferences.put("path-load-game", file.getPath());
@@ -2508,10 +2516,10 @@ public final class HexGui
     private Node m_current;
     private GameInfo m_gameinfo;
     private HexColor m_tomove;
-    private boolean m_gameChanged;
     private Clock m_blackClock;
     private Clock m_whiteClock;
-
+    private String m_gameSnapshot;
+    
     private ArrayList<AnalyzeDefinition> m_analyzeCommands;
 
     private final MessageDialogs m_messageDialogs =
