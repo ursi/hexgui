@@ -246,7 +246,11 @@ public final class HexGui
         else if (cmd.equals("solve_state"))
         {
             sendCommand("param_dfpn use_guifx 1\n", null);
-            sendCommand("dfpn-solve-state " + m_tomove + "\n", null);
+            Runnable callback = new GuiRunnable(new Runnable()
+                {
+                    public void run() { cbSolveState(); }
+                });
+            sendCommand("dfpn-solve-state " + m_tomove + "\n", callback);
         }
         else if (cmd.equals("program_options"))
         {
@@ -1454,6 +1458,14 @@ public final class HexGui
         ParameterDialog.editParameters(m_curAnalyzeCommand.getCommand(), this,
                                        "Edit Parameters", response, m_white,
                                        m_messageDialogs);
+    }
+
+    public void cbSolveState()
+    {
+        if (!m_white.wasSuccess())
+            return;
+        String response = m_white.getResponse();
+        m_statusbar.setMessage(format("Winning: {0}", response));
     }
 
     //==================================================
