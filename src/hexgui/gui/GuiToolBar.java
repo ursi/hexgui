@@ -271,8 +271,7 @@ public final class GuiToolBar
 	m_swap = makeButton("hexgui/images/swap.png",
 			    "game_swap",
 			    "Play swap move",
-			    "Swap",
-                            KeyEvent.VK_S);
+			    "Swap");
 	m_toolBar.add(m_swap);
 	m_swap.setEnabled(false);
 
@@ -321,8 +320,11 @@ public final class GuiToolBar
         m_toolBar.add(m_hint);
         m_hint.setEnabled(false);
 
-        m_solve = makeButton("hexgui/images/solve.png", "solve_state",
-                             "Solve State with DFPN", "Solve");
+        m_solve = makeButton("hexgui/images/solve.png",
+                             "solve_state",
+                             "Solve State with DFPN",
+                             "Solve",
+                             KeyEvent.VK_S);
         m_toolBar.add(m_solve);
         m_solve.setEnabled(false);
 
