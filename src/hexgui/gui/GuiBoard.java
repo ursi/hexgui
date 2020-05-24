@@ -337,13 +337,13 @@ public final class GuiBoard
     }
 
     /** Sets the given point to the given color.
-        Special points are ignored (SWAP_PIECES, RESIGN, etc).
+        Special points are ignored (SWAP_SIDES, RESIGN, etc).
 	@param point the point
 	@param color the color to set it to.
     */
     public void setColor(HexPoint point, HexColor color)
     {
-        if (HexPoint.SWAP_PIECES == point || HexPoint.RESIGN == point) {
+        if (HexPoint.SWAP_SIDES == point || HexPoint.RESIGN == point) {
             return;
         }
 
@@ -363,11 +363,11 @@ public final class GuiBoard
     }
 
     /** Gets the field at the specified point. 
-        Special points are ignored (SWAP_PIECES, etc).
+        Special points are ignored (SWAP_SIDES, etc).
     */
     public GuiField getField(HexPoint point)
     {
-        if (HexPoint.SWAP_PIECES == point || HexPoint.RESIGN == point) {
+        if (HexPoint.SWAP_SIDES == point || HexPoint.RESIGN == point) {
             return null;
         }
         
@@ -387,7 +387,7 @@ public final class GuiBoard
 
     public void markLastPlayed(HexPoint point)
     {
-        assert(point != HexPoint.SWAP_PIECES);
+        assert(point != HexPoint.SWAP_SIDES);
 
 	if (m_last_played != null) 
 	    m_last_played.clearAttributes(GuiField.LAST_PLAYED);
@@ -418,7 +418,7 @@ public final class GuiBoard
     /** Sets the given point's alpha color. */
     public void setAlphaColor(HexPoint point, Color color)
     {
-        if (point == HexPoint.get("swap-pieces"))
+        if (point == HexPoint.get("swap-sides"))
             return;
         if (point == HexPoint.get("resign"))
             return;
@@ -428,7 +428,7 @@ public final class GuiBoard
 
     public void setAlphaColor(HexPoint point, Color color, float blend)
     {
-        if (point == HexPoint.get("swap-pieces"))
+        if (point == HexPoint.get("swap-sides"))
             return;
         if (point == HexPoint.get("resign"))
             return;
@@ -436,11 +436,11 @@ public final class GuiBoard
         repaint();
     }
 
-    /** Returns the point's alpha color; null if it is 'swap-pieces'
+    /** Returns the point's alpha color; null if it is 'swap-sides'
         or resign. */
     public Color getAlphaColor(HexPoint point)
     {
-        if (point == HexPoint.get("swap-pieces"))
+        if (point == HexPoint.get("swap-sides"))
             return null;
         if (point == HexPoint.get("resign"))
             return null;

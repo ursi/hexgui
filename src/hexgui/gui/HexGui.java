@@ -206,7 +206,7 @@ public final class HexGui
 	    down();
         } else if (cmd.equals("game_swap")) {
             end_setup();
-            humanMove(new Move(HexPoint.get("swap-pieces"), m_tomove));
+            humanMove(new Move(HexPoint.get("swap-sides"), m_tomove));
         } else if (cmd.equals("genmove")) {
             end_setup();
 	    htpGenMove(m_tomove);
@@ -1870,7 +1870,7 @@ public final class HexGui
      * changes to the game tree or the HTP. */
     private void guiPlay(Move move)
     {
-        if (m_guiboard.isYBoard() && move.getPoint() == HexPoint.SWAP_PIECES)
+        if (m_guiboard.isYBoard() && move.getPoint() == HexPoint.SWAP_SIDES)
             m_guiboard.swapColors();
         else
             m_guiboard.setColor(move.getPoint(),
@@ -1904,7 +1904,7 @@ public final class HexGui
 	}
         else
         {
-            if (move.getPoint() == HexPoint.SWAP_PIECES)
+            if (move.getPoint() == HexPoint.SWAP_SIDES)
             {
                 if (!m_current.isSwapAllowed())
                 {
@@ -1932,7 +1932,7 @@ public final class HexGui
         stopClock(m_tomove);
 
         if (m_guiboard.isYBoard() 
-            || m_current.getMove().getPoint() != HexPoint.SWAP_PIECES)
+            || m_current.getMove().getPoint() != HexPoint.SWAP_SIDES)
             cmdToggleToMove();
         startClock(m_tomove);
 
@@ -2062,7 +2062,7 @@ public final class HexGui
         {
             Move move = node.getMove();
             if (m_guiboard.isYBoard() 
-                && move.getPoint() == HexPoint.SWAP_PIECES)
+                && move.getPoint() == HexPoint.SWAP_SIDES)
                 m_guiboard.swapColors();
             else
                 m_guiboard.setColor(move.getPoint(), HexColor.EMPTY);
@@ -2202,7 +2202,7 @@ public final class HexGui
             // player to move is always opposite of last move
             m_tomove = m_current.getMove().getColor();
             if (m_guiboard.isYBoard() 
-                || m_current.getMove().getPoint() != HexPoint.SWAP_PIECES)
+                || m_current.getMove().getPoint() != HexPoint.SWAP_SIDES)
                 m_tomove = m_tomove.otherColor();
         }
         else if (m_current.hasSetup())
@@ -2235,7 +2235,7 @@ public final class HexGui
             return;
         }
 
-        if (move.getPoint() == HexPoint.SWAP_PIECES)
+        if (move.getPoint() == HexPoint.SWAP_SIDES)
         {
             Node parent = m_current.getParent();
             assert(parent != null);

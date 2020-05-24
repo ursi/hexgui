@@ -24,7 +24,7 @@ public final class HexPoint implements Comparable
     public static final HexPoint SOUTH;
     public static final HexPoint WEST;
     public static final HexPoint EAST;
-    public static final HexPoint SWAP_PIECES;
+    public static final HexPoint SWAP_SIDES;
     public static final HexPoint RESIGN;
     public static final HexPoint INVALID;
 
@@ -42,7 +42,7 @@ public final class HexPoint implements Comparable
 
         INVALID     = s_points[0] = new HexPoint(0, "invalid");
 	RESIGN      = s_points[1] = new HexPoint(1, "resign");
-	SWAP_PIECES = s_points[2] = new HexPoint(2, "swap-pieces");
+	SWAP_SIDES = s_points[2] = new HexPoint(2, "swap-sides");
 
 	NORTH       = s_points[3] = new HexPoint(3, "north");
 	EAST        = s_points[4] = new HexPoint(4, "east");
@@ -96,7 +96,26 @@ public final class HexPoint implements Comparable
     public static HexPoint get(String name) 
     {
         if (name.equalsIgnoreCase("swap"))
-            return SWAP_PIECES;
+            return SWAP_SIDES;
+
+        // Some versions of HexGui up to 0.9.GIT used "swap-pieces" in
+        // SGF files when "swap-sides" should have been used according
+        // to the SGF specification. The specification says:
+        //
+        // swap-sides - the player elects to swap sides with his
+        // opponent; if he was playing Black he now plays White, and
+        // vice versa.
+        //
+        // swap-pieces - the player elects to swap pieces with his
+        // opponent - all of Black's pieces are coloured White, and
+        // White's pieces are coloured Black. Then the entire board is
+        // reflected in the long diagonal axis.
+        //
+        // For backward compatibility, we must still accept
+        // "swap-pieces" when reading SGF files written by HexGui
+        // 0.9.GIT or earlier.
+        if (name.equalsIgnoreCase("swap-pieces"))
+            return SWAP_SIDES;
 
         for (int x=0; x<MAX_POINTS; x++) 
             if (name.equalsIgnoreCase(s_points[x].toString()))
