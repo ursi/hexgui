@@ -48,6 +48,7 @@ public final class SgfReader
 	m_tokenizer = new StreamTokenizer(m_reader);
 	m_gameinfo = new GameInfo();
 	m_warnings = new Vector<String>();
+        m_swap_bug = false;
 	try {
 	    findGameTree();
 	    m_gametree = parseGameTree(null, true);
@@ -210,10 +211,10 @@ public final class SgfReader
         //   is reflected in the long diagonal axis.
         //
         // For backward compatibility, we must compensate for the
-        // incorrect use of "swap-pieces" in SGF files written by
-        // HexGui 0.9.GIT or earlier.
+        // incorrect use of "swap-pieces" when reading SGF files
+        // written by HexGui 0.9.GIT or earlier.
 
-        if (s.equals("swap-pieces")) {
+        if (m_swap_bug && s.equals("swap-pieces")) {
             s = "swap-sides";
         }
         
@@ -299,6 +300,14 @@ public final class SgfReader
                 }
                 m_gameinfo.setBoardSize(dim);
             } 
+            else if (name.equals("AP")) {
+                node.setSgfProperty(name, val);
+                String regex = "HexGui:0\\.[0-9](\\z|[^0-9].*)";
+                if (val.matches(regex)) {
+                    // version HexGui:0.9 or earlier
+                    m_swap_bug = true;
+                }
+            }
             else {
                 node.setSgfProperty(name, val);
             }
@@ -452,6 +461,7 @@ public final class SgfReader
     private Node m_gametree;
     private GameInfo m_gameinfo;
     private Vector<String> m_warnings;
+    private boolean m_swap_bug;
 }
 
 //----------------------------------------------------------------------------
