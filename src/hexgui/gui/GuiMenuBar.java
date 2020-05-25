@@ -216,8 +216,9 @@ public final class GuiMenuBar
         m_genmove.setActionCommand("genmove");
         menu.add(m_genmove);
 
-	// FIXME: implement!!
 	m_resign = new JMenuItem("Resign");
+        m_resign.addActionListener(m_listener);
+        m_resign.setActionCommand("resign");
 	menu.add(m_resign);
 
         menu.addSeparator();

@@ -25,12 +25,14 @@ public final class HexPoint implements Comparable
     public static final HexPoint WEST;
     public static final HexPoint EAST;
     public static final HexPoint SWAP_SIDES;
+    public static final HexPoint SWAP_PIECES;
     public static final HexPoint RESIGN;
+    public static final HexPoint FORFEIT;
     public static final HexPoint INVALID;
 
     public static final int MAX_WIDTH  = 19;
     public static final int MAX_HEIGHT = 19;
-    public static final int MAX_POINTS = MAX_WIDTH*MAX_HEIGHT + 7;
+    public static final int MAX_POINTS = MAX_WIDTH*MAX_HEIGHT + 9;
 
     public static final int DEFAULT_SIZE = 11;
 
@@ -42,12 +44,14 @@ public final class HexPoint implements Comparable
 
         INVALID     = s_points[0] = new HexPoint(0, "invalid");
 	RESIGN      = s_points[1] = new HexPoint(1, "resign");
-	SWAP_SIDES = s_points[2] = new HexPoint(2, "swap-sides");
+	FORFEIT     = s_points[2] = new HexPoint(2, "forfeit");
+	SWAP_SIDES  = s_points[3] = new HexPoint(3, "swap-sides");
+	SWAP_PIECES = s_points[4] = new HexPoint(4, "swap-pieces");
 
-	NORTH       = s_points[3] = new HexPoint(3, "north");
-	EAST        = s_points[4] = new HexPoint(4, "east");
-	SOUTH       = s_points[5] = new HexPoint(5, "south");
-	WEST        = s_points[6] = new HexPoint(6, "west");
+	NORTH       = s_points[5] = new HexPoint(5, "north");
+	EAST        = s_points[6] = new HexPoint(6, "east");
+	SOUTH       = s_points[7] = new HexPoint(7, "south");
+	WEST        = s_points[8] = new HexPoint(8, "west");
 
 	for (int y=0; y<MAX_HEIGHT; y++) {
 	    for (int x=0; x<MAX_WIDTH; x++) {

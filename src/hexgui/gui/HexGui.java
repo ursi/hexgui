@@ -207,6 +207,9 @@ public final class HexGui
         } else if (cmd.equals("game_swap")) {
             end_setup();
             humanMove(new Move(HexPoint.get("swap-sides"), m_tomove));
+        } else if (cmd.equals("resign")) {
+            end_setup();
+            humanMove(new Move(HexPoint.get("resign"), m_tomove));
         } else if (cmd.equals("genmove")) {
             end_setup();
 	    htpGenMove(m_tomove);
@@ -1882,8 +1885,6 @@ public final class HexGui
 
     private void play(Move move)
     {
-        if (move.getPoint() == HexPoint.RESIGN) return;
-
         // see if variation already exists; if so, do not add a duplicate
         int variation = -1;
         for (int i=0; i<m_current.numChildren(); i++)
@@ -1912,6 +1913,10 @@ public final class HexGui
                     return;
                 }
             }
+            else if (move.getPoint() == HexPoint.RESIGN)
+            {
+                // for simplicity, resigning is always possible
+            }
             else
             {
                 if (m_guiboard.getColor(move.getPoint()) !=  HexColor.EMPTY)
@@ -1931,9 +1936,11 @@ public final class HexGui
 
         stopClock(m_tomove);
 
-        if (m_guiboard.isYBoard() 
-            || m_current.getMove().getPoint() != HexPoint.SWAP_SIDES)
+        if (m_guiboard.isYBoard()) {
             cmdToggleToMove();
+        } else if (m_current.getMove().getPoint() != HexPoint.SWAP_SIDES && m_current.getMove().getPoint() != HexPoint.RESIGN && m_current.getMove().getPoint() != HexPoint.FORFEIT) {
+            cmdToggleToMove();
+        }
         startClock(m_tomove);
 
         guiPlay(move);
@@ -2202,7 +2209,7 @@ public final class HexGui
             // player to move is always opposite of last move
             m_tomove = m_current.getMove().getColor();
             if (m_guiboard.isYBoard() 
-                || m_current.getMove().getPoint() != HexPoint.SWAP_SIDES)
+                || (m_current.getMove().getPoint() != HexPoint.SWAP_SIDES && m_current.getMove().getPoint() != HexPoint.RESIGN && m_current.getMove().getPoint() != HexPoint.FORFEIT))
                 m_tomove = m_tomove.otherColor();
         }
         else if (m_current.hasSetup())
