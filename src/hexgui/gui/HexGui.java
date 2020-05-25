@@ -608,8 +608,9 @@ public final class HexGui
         for (int i = path.size()-1; i>=0; i--) {
             node = path.elementAt(i);
             if (node.hasMove()) {
-                guiPlay(node.getMove());
-                htpPlay(node.getMove());
+                Move move = node.getMove();
+                guiPlay(move);
+                htpPlay(move);
             }
             if (node.hasSetup()) {
                 playSetup(node);
@@ -2030,8 +2031,8 @@ public final class HexGui
         }
     }
 
-    // Play the setup moves of the given node.
-    private void playSetup(Node node)
+    // Play the setup moves of the given node in the Gui, not HTP.
+    private void guiPlaySetup(Node node)
     {
         Vector<HexPoint> black = node.getSetup(HexColor.BLACK);
         Vector<HexPoint> white = node.getSetup(HexColor.WHITE);
@@ -2051,6 +2052,11 @@ public final class HexGui
             HexPoint point = empty.get(j);
             m_guiboard.setColor(point, HexColor.EMPTY);
         }
+    }
+
+    private void playSetup(Node node)
+    {
+        guiPlaySetup(node);
         htpSetUpCurrentBoard();
     }
 
@@ -2063,14 +2069,14 @@ public final class HexGui
         replayUpToNode(node.getParent());
     }
 
-    private void playNode(Node node)
+    // Play the given node in the Gui, not HTP.
+    private void guiPlayNode(Node node)
     {
         node.markRecent();
         if (node.hasMove())
         {
             Move move = node.getMove();
             m_guiboard.setColor(move.getPoint(), move.getColor());
-            htpPlay(move);
             if (move.getPoint() == HexPoint.SWAP_PIECES) {
                 m_guiboard.swapPieces();
             }
@@ -2080,7 +2086,26 @@ public final class HexGui
         }
         if (node.hasSetup())
         {
-            playSetup(node);
+            guiPlaySetup(node);
+        }
+    }
+
+    private void playNode(Node node)
+    {
+        node.markRecent();
+        if (node.hasMove())
+        {
+            Move move = node.getMove();
+            guiPlay(move);
+            htpPlay(move);
+            m_statusbar.setMessage(node.getDepth() + " "
+                                   + move.getColor().toString() + " "
+                                   + move.getPoint().toString());
+        }
+        if (node.hasSetup())
+        {
+            guiPlaySetup(node);
+            htpSetUpCurrentBoard();
         }
     }
 
