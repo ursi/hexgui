@@ -1165,7 +1165,9 @@ public final class HexGui
      * command for setup moves that remove a piece, or that change the
      * color of an already existing piece, and swap, resign, and
      * forfeit moves are possibly not implemented in HTP, or may not
-     * be undoable correctly. */
+     * be undoable correctly. If the move is swap-pieces, the just
+     * update HTP to the current board position; so gui should always
+     * be updated before calling this. */
     private void htpPlay(Move move)
     {
         if (move.getPoint() == HexPoint.RESIGN
@@ -1173,10 +1175,14 @@ public final class HexGui
             || move.getPoint() == HexPoint.SWAP_SIDES) {
             return;
         }
+        if (move.getPoint() == HexPoint.SWAP_PIECES) {
+            htpSetUpCurrentBoard();
+        }
 	sendCommand("play " + move.getColor().toString() +
 		    " " + move.getPoint().toString() + "\n", null);
     }
 
+    /** GUI must already be updated prior to calling this. */
     private void htpUndo(Move move)
     {
         if (move.getPoint() == HexPoint.RESIGN
@@ -2090,21 +2096,24 @@ public final class HexGui
         }
     }
 
+    // Play the given node in the Gui and HTP. For HTP, setup moves
+    // and swap-pieces moves are special cases, as they aren't in
+    // general supported by HTP. So we rebuild the board from scratch
+    // in these cases.
     private void playNode(Node node)
     {
-        node.markRecent();
+        guiPlayNode(node);
         if (node.hasMove())
         {
             Move move = node.getMove();
-            guiPlay(move);
-            htpPlay(move);
-            m_statusbar.setMessage(node.getDepth() + " "
-                                   + move.getColor().toString() + " "
-                                   + move.getPoint().toString());
+            if (move.getPoint() == HexPoint.SWAP_PIECES) {
+                htpSetUpCurrentBoard();
+            } else {
+                htpPlay(move);
+            }
         }
         if (node.hasSetup())
         {
-            guiPlaySetup(node);
             htpSetUpCurrentBoard();
         }
     }
@@ -2122,7 +2131,11 @@ public final class HexGui
             } else {
                 m_guiboard.setColor(move.getPoint(), HexColor.EMPTY);
             }
-            htpUndo(move);
+            if (move.getPoint() == HexPoint.SWAP_PIECES) {
+                replayUpToNode(node.getParent());
+            } else {
+                htpUndo(move);
+            }
         }
         if (node.hasSetup())
         {
