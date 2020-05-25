@@ -619,8 +619,9 @@ public final class HexGui
 
     /** Run HTP commands to set up the current board position from
         scratch. This may be necessary when a setup move removes a
-        piece, or changes the color of an existing piece, as there is
-        no valid HTP command to do so. */
+        piece, or changes the color of an existing piece, or when
+        swap-pieces is played, since there is no valid HTP command to
+        do so. */
     private void htpSetUpCurrentBoard()
     {
         htpClearBoard();
@@ -1161,15 +1162,27 @@ public final class HexGui
     /** Play a move on the attached HTP backend. This only works if
      * move is a legal move of color black or white. There is no HTP
      * command for setup moves that remove a piece, or that change the
-     * color of an already existing piece. */
+     * color of an already existing piece, and swap, resign, and
+     * forfeit moves are possibly not implemented in HTP, or may not
+     * be undoable correctly. */
     private void htpPlay(Move move)
     {
+        if (move.getPoint() == HexPoint.RESIGN
+            || move.getPoint() == HexPoint.FORFEIT
+            || move.getPoint() == HexPoint.SWAP_SIDES) {
+            return;
+        }
 	sendCommand("play " + move.getColor().toString() +
 		    " " + move.getPoint().toString() + "\n", null);
     }
 
-    private void htpUndo()
+    private void htpUndo(Move move)
     {
+        if (move.getPoint() == HexPoint.RESIGN
+            || move.getPoint() == HexPoint.FORFEIT
+            || move.getPoint() == HexPoint.SWAP_SIDES) {
+            return;
+        }
 	sendCommand("undo\n", null);
     }
 
@@ -2084,7 +2097,7 @@ public final class HexGui
             } else {
                 m_guiboard.setColor(move.getPoint(), HexColor.EMPTY);
             }
-            htpUndo();
+            htpUndo(move);
         }
         if (node.hasSetup())
         {
