@@ -343,13 +343,11 @@ public final class GuiBoard
     */
     public void setColor(HexPoint point, HexColor color)
     {
-        if (HexPoint.SWAP_SIDES == point || HexPoint.RESIGN == point) {
-            return;
-        }
-
 	GuiField f = getField(point);
-	f.setColor(color);
-        repaint();
+        if (f != null) {
+            f.setColor(color);
+            repaint();
+        }
     }
 
     /** Gets the color of the specified point.
@@ -367,10 +365,13 @@ public final class GuiBoard
     */
     public GuiField getField(HexPoint point)
     {
-        if (HexPoint.SWAP_SIDES == point || HexPoint.RESIGN == point) {
+        if (point == HexPoint.SWAP_SIDES
+            || point == HexPoint.SWAP_PIECES
+            || point == HexPoint.RESIGN
+            || point == HexPoint.FORFEIT) {
             return null;
         }
-        
+
 	for (int x=0; x<m_field.length; x++) {
 	    if (m_field[x].getPoint() == point) 
 		return m_field[x];
@@ -418,34 +419,32 @@ public final class GuiBoard
     /** Sets the given point's alpha color. */
     public void setAlphaColor(HexPoint point, Color color)
     {
-        if (point == HexPoint.get("swap-sides"))
-            return;
-        if (point == HexPoint.get("resign"))
-            return;
-	getField(point).setAlphaColor(color);
-        repaint();
+        GuiField f = getField(point);
+        if (f != null) {
+            f.setAlphaColor(color);
+            repaint();
+        }
     }
 
     public void setAlphaColor(HexPoint point, Color color, float blend)
     {
-        if (point == HexPoint.get("swap-sides"))
-            return;
-        if (point == HexPoint.get("resign"))
-            return;
-	getField(point).setAlphaColor(color, blend);
-        repaint();
+        GuiField f = getField(point);
+        if (f != null) {
+            f.setAlphaColor(color, blend);
+            repaint();
+        }
     }
 
     /** Returns the point's alpha color; null if it is 'swap-sides'
         or resign. */
     public Color getAlphaColor(HexPoint point)
     {
-        if (point == HexPoint.get("swap-sides"))
+        GuiField f = getField(point);
+        if (f != null) {
+            return f.getAlphaColor();
+        } else {
             return null;
-        if (point == HexPoint.get("resign"))
-            return null;
-
-	return getField(point).getAlphaColor();
+        }
     }
     
     /** Sets the given point's text. */

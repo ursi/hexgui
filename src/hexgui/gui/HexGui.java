@@ -210,6 +210,9 @@ public final class HexGui
         } else if (cmd.equals("resign")) {
             end_setup();
             humanMove(new Move(HexPoint.get("resign"), m_tomove));
+        } else if (cmd.equals("forfeit")) {
+            end_setup();
+            humanMove(new Move(HexPoint.get("forfeit"), m_tomove));
         } else if (cmd.equals("genmove")) {
             end_setup();
 	    htpGenMove(m_tomove);
@@ -1915,7 +1918,13 @@ public final class HexGui
             }
             else if (move.getPoint() == HexPoint.RESIGN)
             {
-                // for simplicity, resigning is always possible
+                // for simplicity, resigning is always possible (even
+                // twice in a row!)
+            }
+            else if (move.getPoint() == HexPoint.FORFEIT)
+            {
+                // for simplicity, forfeitting is always possible
+                // (even twice in a row!)
             }
             else
             {
@@ -2049,6 +2058,12 @@ public final class HexGui
                 m_statusbar.setMessage(node.getDepth() + " " 
                                        + move.getColor().toString() 
                                        + " resigned.");
+            }
+            else if (move.getPoint() == HexPoint.FORFEIT)
+            {
+                m_statusbar.setMessage(node.getDepth() + " " 
+                                       + move.getColor().toString() 
+                                       + " forfeited.");
             }
             else
             {
@@ -2235,7 +2250,7 @@ public final class HexGui
 
         Move move = m_current.getMove();
 
-        if (move.getPoint() == HexPoint.RESIGN)
+        if (move.getPoint() == HexPoint.RESIGN || move.getPoint() == HexPoint.FORFEIT)
         {
             m_guiboard.markSwapPlayed(null);
 	    m_guiboard.markLastPlayed(null);

@@ -221,6 +221,11 @@ public final class GuiMenuBar
         m_resign.setActionCommand("resign");
 	menu.add(m_resign);
 
+	m_forfeit = new JMenuItem("Forfeit");
+        m_forfeit.addActionListener(m_listener);
+        m_forfeit.setActionCommand("forfeit");
+	menu.add(m_forfeit);
+
         menu.addSeparator();
         
         item = new JMenuItem("Delete Current Branch");
@@ -603,7 +608,7 @@ public final class GuiMenuBar
     private JMenuItem m_connect_local, m_connect_remote, 
         m_disconnect, m_reconnect;
 
-    private JMenuItem m_resign, m_swap, m_genmove;
+    private JMenuItem m_resign, m_forfeit, m_swap, m_genmove;
 
     private ButtonGroup m_bsGroup;    // board sizes
     private ButtonGroup m_btGroup;    // board view types (diamond, flat, etc)
