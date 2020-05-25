@@ -195,6 +195,28 @@ public final class SgfReader
     private HexPoint parseMove(String s) throws SgfError
     {
         s = s.trim().toLowerCase(Locale.ENGLISH);
+
+        // Special case: some or all versions of HexGui up to 0.9.GIT
+        // incorrectly used "swap-pieces" instead of "swap-sides".
+        // The SGF specification states:
+        //
+        // * swap-sides - the player elects to swap sides with his
+        //   opponent; if he was playing Black he now plays White, and
+        //   vice versa.
+        //
+        // * swap-pieces - the player elects to swap pieces with his
+        //   opponent - all of Black's pieces are coloured White, and
+        //   White's pieces are coloured Black. Then the entire board
+        //   is reflected in the long diagonal axis.
+        //
+        // For backward compatibility, we must compensate for the
+        // incorrect use of "swap-pieces" in SGF files written by
+        // HexGui 0.9.GIT or earlier.
+
+        if (s.equals("swap-pieces")) {
+            s = "swap-sides";
+        }
+        
         // HexPoint.get() handles special move values like "swap"
         HexPoint result = HexPoint.get(s);
         if (result == null)

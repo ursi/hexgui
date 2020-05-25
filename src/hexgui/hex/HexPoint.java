@@ -98,25 +98,6 @@ public final class HexPoint implements Comparable
         if (name.equalsIgnoreCase("swap"))
             return SWAP_SIDES;
 
-        // Some versions of HexGui up to 0.9.GIT used "swap-pieces" in
-        // SGF files when "swap-sides" should have been used according
-        // to the SGF specification. The specification says:
-        //
-        // swap-sides - the player elects to swap sides with his
-        // opponent; if he was playing Black he now plays White, and
-        // vice versa.
-        //
-        // swap-pieces - the player elects to swap pieces with his
-        // opponent - all of Black's pieces are coloured White, and
-        // White's pieces are coloured Black. Then the entire board is
-        // reflected in the long diagonal axis.
-        //
-        // For backward compatibility, we must still accept
-        // "swap-pieces" when reading SGF files written by HexGui
-        // 0.9.GIT or earlier.
-        if (name.equalsIgnoreCase("swap-pieces"))
-            return SWAP_SIDES;
-
         for (int x=0; x<MAX_POINTS; x++) 
             if (name.equalsIgnoreCase(s_points[x].toString()))
                 return s_points[x];
