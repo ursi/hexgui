@@ -7,7 +7,7 @@ package hexgui.hex;
 //----------------------------------------------------------------------------
 
 /** Move.
-    Contains a HexPoint and a HexColor.  To construct a swap moves or
+    Contains a HexPoint and a HexColor.  To construct swap moves or
     other special moves use the appropriate HexPoint.  Immutable.
 */
 public final class Move

@@ -204,13 +204,16 @@ public final class HexGui
         } else if (cmd.equals("game_down")) {
             end_setup();
 	    down();
-        } else if (cmd.equals("game_swap")) {
+        } else if (cmd.equals("game_swap_sides")) {
             end_setup();
             humanMove(new Move(HexPoint.get("swap-sides"), m_tomove));
-        } else if (cmd.equals("resign")) {
+        } else if (cmd.equals("game_swap_pieces")) {
+            end_setup();
+            humanMove(new Move(HexPoint.get("swap-pieces"), m_tomove));
+        } else if (cmd.equals("game_resign")) {
             end_setup();
             humanMove(new Move(HexPoint.get("resign"), m_tomove));
-        } else if (cmd.equals("forfeit")) {
+        } else if (cmd.equals("game_forfeit")) {
             end_setup();
             humanMove(new Move(HexPoint.get("forfeit"), m_tomove));
         } else if (cmd.equals("genmove")) {
@@ -1876,12 +1879,14 @@ public final class HexGui
      * changes to the game tree or the HTP. */
     private void guiPlay(Move move)
     {
-        if (m_guiboard.isYBoard() && move.getPoint() == HexPoint.SWAP_SIDES)
+        if (m_guiboard.isYBoard() && move.getPoint() == HexPoint.SWAP_PIECES) {
             m_guiboard.swapColors();
-        else
+        } else if (move.getPoint() == HexPoint.SWAP_PIECES) {
+            m_guiboard.swapPieces();
+        } else {
             m_guiboard.setColor(move.getPoint(),
                                 move.getColor());
-        
+        }
         m_guiboard.clearMarks();
 	markLastPlayedStone();
     }
@@ -1908,7 +1913,7 @@ public final class HexGui
 	}
         else
         {
-            if (move.getPoint() == HexPoint.SWAP_SIDES)
+            if (move.getPoint() == HexPoint.SWAP_SIDES || move.getPoint() == HexPoint.SWAP_PIECES)
             {
                 if (!m_current.isSwapAllowed())
                 {
@@ -2053,24 +2058,12 @@ public final class HexGui
             Move move = node.getMove();
             m_guiboard.setColor(move.getPoint(), move.getColor());
             htpPlay(move);
-            if (move.getPoint() == HexPoint.RESIGN)
-            {
-                m_statusbar.setMessage(node.getDepth() + " " 
-                                       + move.getColor().toString() 
-                                       + " resigned.");
+            if (move.getPoint() == HexPoint.SWAP_PIECES) {
+                m_guiboard.swapPieces();
             }
-            else if (move.getPoint() == HexPoint.FORFEIT)
-            {
-                m_statusbar.setMessage(node.getDepth() + " " 
-                                       + move.getColor().toString() 
-                                       + " forfeited.");
-            }
-            else
-            {
-                m_statusbar.setMessage(node.getDepth() + " "
-                                       + move.getColor().toString() + " "
-                                       + move.getPoint().toString());
-            }
+            m_statusbar.setMessage(node.getDepth() + " "
+                                   + move.getColor().toString() + " "
+                                   + move.getPoint().toString());
         }
         if (node.hasSetup())
         {
@@ -2084,10 +2077,13 @@ public final class HexGui
         {
             Move move = node.getMove();
             if (m_guiboard.isYBoard() 
-                && move.getPoint() == HexPoint.SWAP_SIDES)
+                && move.getPoint() == HexPoint.SWAP_PIECES) {
                 m_guiboard.swapColors();
-            else
+            } else if (move.getPoint() == HexPoint.SWAP_PIECES) {
+                m_guiboard.swapPieces();
+            } else {
                 m_guiboard.setColor(move.getPoint(), HexColor.EMPTY);
+            }
             htpUndo();
         }
         if (node.hasSetup())
@@ -2264,6 +2260,14 @@ public final class HexGui
 
             m_guiboard.markLastPlayed(null);
             m_guiboard.markSwapPlayed(parent.getMove().getPoint());
+        }
+        else if (move.getPoint() == HexPoint.SWAP_PIECES)
+        {
+            Node parent = m_current.getParent();
+            assert(parent != null);
+
+            m_guiboard.markLastPlayed(null);
+            m_guiboard.markSwapPlayed(parent.getMove().getPoint().reflect());
         }
         else
         {

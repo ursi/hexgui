@@ -158,6 +158,13 @@ public final class HexPoint implements Comparable
 	m_string = name;
     }
 
+    // return the HexPoint that is opposite to this one, across the
+    // long diagonal.
+    public HexPoint reflect()
+    {
+        return HexPoint.get(this.y, this.x);
+    }
+    
     public final int x, y;
     private final String m_string;
 }

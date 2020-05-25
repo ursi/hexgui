@@ -9,6 +9,8 @@ import hexgui.util.*;
 import hexgui.game.Node;
 
 import java.util.Vector;
+import java.util.Map;
+import java.util.TreeMap;
 import java.math.BigInteger;
 import javax.swing.*;          
 import javax.swing.border.EtchedBorder;
@@ -388,7 +390,7 @@ public final class GuiBoard
 
     public void markLastPlayed(HexPoint point)
     {
-        assert(point != HexPoint.SWAP_SIDES);
+        assert(point != HexPoint.SWAP_SIDES && point != HexPoint.SWAP_PIECES);
 
 	if (m_last_played != null) 
 	    m_last_played.clearAttributes(GuiField.LAST_PLAYED);
@@ -475,10 +477,37 @@ public final class GuiBoard
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
             if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST)
+                point == HexPoint.SOUTH || point == HexPoint.WEST) {
                 continue;
+            }
             HexColor color = m_field[x].getColor();
             m_field[x].setColor(color.otherColor());
+        }
+    }
+
+    public void swapPieces() 
+    {
+        // Due to the weird way the data structures are setting up, it
+        // is tricky to move pieces to another location on the board.
+        // In particular, there is no O(1) way to find the HexField
+        // attached to a given HexPoint.
+        Map<HexPoint, HexColor> colors = new TreeMap<HexPoint, HexColor>();
+        for (int x=0; x<m_field.length; x++) {
+            HexPoint point = m_field[x].getPoint();
+            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
+                point == HexPoint.SOUTH || point == HexPoint.WEST) {
+                continue;
+            }
+            colors.put(point, m_field[x].getColor());
+        }
+        for (int x=0; x<m_field.length; x++) {
+            HexPoint point = m_field[x].getPoint();
+            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
+                point == HexPoint.SOUTH || point == HexPoint.WEST) {
+                continue;
+            }
+            HexPoint otherpoint = point.reflect();
+            m_field[x].setColor(colors.get(otherpoint).otherColor());
         }
     }
 

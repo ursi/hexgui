@@ -64,7 +64,8 @@ public final class GuiMenuBar
 
     public void updateMenuStates(Node current)
     {
-        m_swap.setEnabled(current.isSwapAllowed());
+        m_swap_pieces.setEnabled(current.isSwapAllowed());
+        m_swap_sides.setEnabled(current.isSwapAllowed());
     }
 
     //----------------------------------------------------------------------
@@ -206,25 +207,30 @@ public final class GuiMenuBar
 
         menu.addSeparator();
 
-        m_swap = new JMenuItem("Play Swap Move");
-        m_swap.addActionListener(m_listener);
-        m_swap.setActionCommand("game_swap");
-        menu.add(m_swap);
+        m_swap_sides = new JMenuItem("Swap sides");
+        m_swap_sides.addActionListener(m_listener);
+        m_swap_sides.setActionCommand("game_swap_sides");
+        menu.add(m_swap_sides);
+
+        m_swap_pieces = new JMenuItem("Swap pieces");
+        m_swap_pieces.addActionListener(m_listener);
+        m_swap_pieces.setActionCommand("game_swap_pieces");
+        menu.add(m_swap_pieces);
+
+	m_resign = new JMenuItem("Resign");
+        m_resign.addActionListener(m_listener);
+        m_resign.setActionCommand("game_resign");
+	menu.add(m_resign);
+
+	m_forfeit = new JMenuItem("Forfeit");
+        m_forfeit.addActionListener(m_listener);
+        m_forfeit.setActionCommand("game_forfeit");
+	menu.add(m_forfeit);
 
         m_genmove = new JMenuItem("Generate Computer Move");
         m_genmove.addActionListener(m_listener);
         m_genmove.setActionCommand("genmove");
         menu.add(m_genmove);
-
-	m_resign = new JMenuItem("Resign");
-        m_resign.addActionListener(m_listener);
-        m_resign.setActionCommand("resign");
-	menu.add(m_resign);
-
-	m_forfeit = new JMenuItem("Forfeit");
-        m_forfeit.addActionListener(m_listener);
-        m_forfeit.setActionCommand("forfeit");
-	menu.add(m_forfeit);
 
         menu.addSeparator();
         
@@ -608,7 +614,7 @@ public final class GuiMenuBar
     private JMenuItem m_connect_local, m_connect_remote, 
         m_disconnect, m_reconnect;
 
-    private JMenuItem m_resign, m_forfeit, m_swap, m_genmove;
+    private JMenuItem m_resign, m_forfeit, m_swap_pieces, m_swap_sides, m_genmove;
 
     private ButtonGroup m_bsGroup;    // board sizes
     private ButtonGroup m_btGroup;    // board view types (diamond, flat, etc)
