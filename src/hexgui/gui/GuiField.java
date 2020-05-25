@@ -36,24 +36,25 @@ public class GuiField
 
     public GuiField(HexPoint p)
     {
-	this(p, HexColor.EMPTY, 0, null, null);
+	this(p, HexColor.EMPTY, 0, null, null, 0);
     }
 
     public GuiField(HexPoint p, HexColor c, int attributes, 
-                    String text, Color alpha)
+                    String text, Color alpha, float blend)
     {
 	m_point = p;
 	m_color = c;
         m_text = text;
 	m_alpha_color = alpha;
 	m_attributes = attributes;
+        m_alpha_blend = blend;
     }
 
     /** Creates a copy of the given field. */
     public GuiField(GuiField f)
     {
 	this(f.getPoint(), f.getColor(), f.getAttributes(), 
-	     f.getText(), f.getAlphaColor());
+	     f.getText(), f.getAlphaColor(), f.getAlphaBlend());
     }
 
     public static int getStoneMargin(int width)
