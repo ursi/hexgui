@@ -204,7 +204,11 @@ public class GuiField
 
     private void drawSwapPlayed()
     {
-        m_graphics.setColor(Color.white);
+        if (m_color == HexColor.BLACK) {
+            m_graphics.setColor(Color.white);
+        } else {
+            m_graphics.setColor(Color.black);
+        }            
         m_graphics.drawString("S", m_width/2-3, m_height/2+3);
     }
 
