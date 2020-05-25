@@ -206,8 +206,8 @@ public final class SgfReader
         //   vice versa.
         //
         // * swap-pieces - the player elects to swap pieces with his
-        //   opponent - all of Black's pieces are coloured White, and
-        //   White's pieces are coloured Black. Then the entire board
+        //   opponent - all of Black's pieces are colored White, and
+        //   White's pieces are colored Black. Then the entire board
         //   is reflected in the long diagonal axis.
         //
         // For backward compatibility, we must compensate for the

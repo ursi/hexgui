@@ -1923,7 +1923,7 @@ public final class HexGui
             }
             else if (move.getPoint() == HexPoint.FORFEIT)
             {
-                // for simplicity, forfeitting is always possible
+                // for simplicity, forfeiting is always possible
                 // (even twice in a row!)
             }
             else
