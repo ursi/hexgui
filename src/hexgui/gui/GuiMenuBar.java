@@ -555,20 +555,20 @@ public final class GuiMenuBar
         JMenu menu = new JMenu("Board Orientation");
 	m_orGroup = new ButtonGroup();
 
-	String pref = m_preferences.get("gui-board-on-top");
+	String pref = m_preferences.get("gui-board-orientation");
 
 	JRadioButtonMenuItem item;
-	item = new JRadioButtonMenuItem("Black on top");
+	item = new JRadioButtonMenuItem("Positive");
 	item.addActionListener(m_listener);
 	item.setActionCommand("gui_board_orientation");
-	if (pref.equals("black")) item.setSelected(true);
+	if (pref.equals("positive")) item.setSelected(true);
 	m_orGroup.add(item);
 	menu.add(item);
 
-	item = new JRadioButtonMenuItem("White on top");
+	item = new JRadioButtonMenuItem("Negative");
 	item.addActionListener(m_listener);
 	item.setActionCommand("gui_board_orientation");
-	if (pref.equals("white")) item.setSelected(true);
+	if (pref.equals("negative")) item.setSelected(true);
 	m_orGroup.add(item);
 	menu.add(item);
 
@@ -618,6 +618,6 @@ public final class GuiMenuBar
 
     private ButtonGroup m_bsGroup;    // board sizes
     private ButtonGroup m_btGroup;    // board view types (diamond, flat, etc)
-    private ButtonGroup m_orGroup;    // black on top, or white?
+    private ButtonGroup m_orGroup;    // orientation: positive or negative?
     private ButtonGroup m_colorGroup; // whose turn to move?
 }

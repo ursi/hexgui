@@ -161,15 +161,15 @@ public final class GuiBoard
     }
 
     /** Sets whether black on letters is on top or if white on 
-	numbers is on top.  If string is invalid defaults to black on top.
-	@param orient either "Black on top" or "White on top". 
+	numbers is on top.  If string is invalid defaults to positive
+	@param orient either "Positive" or "Negative". 
     */
     public void setOrientation(String orient)
     {
-	if (orient.equals("Black on top"))
-	    m_preferences.put("gui-board-on-top", "black");
-	else if (orient.equals("White on top"))
-	    m_preferences.put("gui-board-on-top", "white");
+	if (orient.equals("Positive"))
+	    m_preferences.put("gui-board-orientation", "positive");
+	else if (orient.equals("Negative"))
+	    m_preferences.put("gui-board-orientation", "negative");
 	else {
 	    System.out.println("GuiBoard: unknown orientation '" + 
 			       orient + "'.");
@@ -673,7 +673,18 @@ public final class GuiBoard
 	    boolean alphaontop = true;
             Vector<Pair<HexPoint, HexPoint>> arrows = m_arrows;
 
-	    if (m_preferences.get("gui-board-on-top").equals("white")) {
+            boolean positive = true;
+            if (m_preferences.get("gui-board-orientation").equals("negative")) {
+                positive = false;
+            }
+            boolean flip;
+            if (m_preferences.get("gui-board-type").equals("Flat2")) {
+                flip = positive;
+            } else {
+                flip = !positive;
+            }
+            
+	    if (flip) {
 		bw = m_height;
 		bh = m_width;
 		alphaontop = false;
