@@ -56,7 +56,7 @@ public final class HexPoint implements Comparable
 	for (int y=0; y<MAX_HEIGHT; y++) {
 	    for (int x=0; x<MAX_WIDTH; x++) {
 		String name = "" + (char)('a' + x) + (y+1);
-		s_points[7 + y*MAX_WIDTH+ x] = new HexPoint(x, y, name);
+		s_points[9 + y*MAX_WIDTH+ x] = new HexPoint(x, y, name);
 	    }
 	}
     }
@@ -88,7 +88,7 @@ public final class HexPoint implements Comparable
 	assert(y >= 0);
 	assert(x < MAX_WIDTH);
 	assert(y < MAX_HEIGHT);
-	return s_points[7 + y*MAX_WIDTH + x];
+	return s_points[9 + y*MAX_WIDTH + x];
     }
     
     /** Returns the point with the given string representation.
