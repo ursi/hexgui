@@ -2150,6 +2150,8 @@ public final class HexGui
 	m_guiboard.repaint();
 	m_toolbar.updateButtonStates(m_current);
         m_menubar.updateMenuStates(m_current);
+        setFrameTitle();
+
         setComment(m_current);
         if (m_current.hasMove()) {
             Move move = m_current.getMove();
@@ -2252,6 +2254,7 @@ public final class HexGui
         to_be_deleted.removeSelf();
 	m_toolbar.updateButtonStates(m_current);
         m_menubar.updateMenuStates(m_current);
+        setFrameTitle();
     }
 
     private void cmdMoveBranchTop()
