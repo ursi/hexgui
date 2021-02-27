@@ -2271,11 +2271,19 @@ public final class HexGui
         }
         else if (m_current.hasMove())
         {
-            // player to move is always opposite of last move
-            m_tomove = m_current.getMove().getColor();
-            if (m_guiboard.isYBoard() 
-                || (m_current.getMove().getPoint() != HexPoint.SWAP_SIDES && m_current.getMove().getPoint() != HexPoint.RESIGN && m_current.getMove().getPoint() != HexPoint.FORFEIT))
-                m_tomove = m_tomove.otherColor();
+            // If the PlayerToMove property is set, use it.
+            HexColor color = m_current.getPlayerToMove();
+            if (color != null) {
+                m_tomove = color;
+            } else {
+                // Otherwise, player to move is always opposite of
+                // last move (except for a swap-sides, resign, or
+                // forfeit move).
+                m_tomove = m_current.getMove().getColor();
+                if (m_guiboard.isYBoard() 
+                    || (m_current.getMove().getPoint() != HexPoint.SWAP_SIDES && m_current.getMove().getPoint() != HexPoint.RESIGN && m_current.getMove().getPoint() != HexPoint.FORFEIT))
+                    m_tomove = m_tomove.otherColor();
+            }
         }
         else if (m_current.hasSetup())
         {
