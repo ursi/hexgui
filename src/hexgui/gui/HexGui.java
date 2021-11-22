@@ -210,6 +210,9 @@ public final class HexGui
         } else if (cmd.equals("game_swap_pieces")) {
             end_setup();
             humanMove(new Move(HexPoint.get("swap-pieces"), m_tomove));
+        } else if (cmd.equals("game_pass")) {
+            end_setup();
+            humanMove(new Move(HexPoint.get("pass"), m_tomove));
         } else if (cmd.equals("game_resign")) {
             end_setup();
             humanMove(new Move(HexPoint.get("resign"), m_tomove));
@@ -1163,16 +1166,17 @@ public final class HexGui
     /** Play a move on the attached HTP backend. This only works if
      * move is a legal move of color black or white. There is no HTP
      * command for setup moves that remove a piece, or that change the
-     * color of an already existing piece, and swap, resign, and
+     * color of an already existing piece, and swap, pass, resign, and
      * forfeit moves are possibly not implemented in HTP, or may not
-     * be undoable correctly. If the move is swap-pieces, the just
+     * be undoable correctly. If the move is swap-pieces, just
      * update HTP to the current board position; so gui should always
      * be updated before calling this. */
     private void htpPlay(Move move)
     {
         if (move.getPoint() == HexPoint.RESIGN
             || move.getPoint() == HexPoint.FORFEIT
-            || move.getPoint() == HexPoint.SWAP_SIDES) {
+            || move.getPoint() == HexPoint.SWAP_SIDES
+            || move.getPoint() == HexPoint.PASS) {
             return;
         }
         if (move.getPoint() == HexPoint.SWAP_PIECES) {
@@ -1187,7 +1191,8 @@ public final class HexGui
     {
         if (move.getPoint() == HexPoint.RESIGN
             || move.getPoint() == HexPoint.FORFEIT
-            || move.getPoint() == HexPoint.SWAP_SIDES) {
+            || move.getPoint() == HexPoint.SWAP_SIDES
+            || move.getPoint() == HexPoint.PASS) {
             return;
         }
 	sendCommand("undo\n", null);
@@ -1941,6 +1946,11 @@ public final class HexGui
                     return;
                 }
             }
+            else if (move.getPoint() == HexPoint.PASS)
+            {
+                // for simplicity, passing is always possible (even
+                // twice in a row!)
+            }
             else if (move.getPoint() == HexPoint.RESIGN)
             {
                 // for simplicity, resigning is always possible (even
@@ -2308,7 +2318,7 @@ public final class HexGui
 
         Move move = m_current.getMove();
 
-        if (move.getPoint() == HexPoint.RESIGN || move.getPoint() == HexPoint.FORFEIT)
+        if (move.getPoint() == HexPoint.RESIGN || move.getPoint() == HexPoint.FORFEIT || move.getPoint() == HexPoint.PASS)
         {
             m_guiboard.markSwapPlayed(null);
 	    m_guiboard.markLastPlayed(null);

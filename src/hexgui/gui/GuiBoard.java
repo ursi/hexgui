@@ -369,6 +369,7 @@ public final class GuiBoard
     {
         if (point == HexPoint.SWAP_SIDES
             || point == HexPoint.SWAP_PIECES
+            || point == HexPoint.PASS
             || point == HexPoint.RESIGN
             || point == HexPoint.FORFEIT) {
             return null;
@@ -438,7 +439,7 @@ public final class GuiBoard
     }
 
     /** Returns the point's alpha color; null if it is 'swap-sides'
-        or resign. */
+        or resign or similar. */
     public Color getAlphaColor(HexPoint point)
     {
         GuiField f = getField(point);

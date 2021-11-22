@@ -217,6 +217,11 @@ public final class GuiMenuBar
         m_swap_pieces.setActionCommand("game_swap_pieces");
         menu.add(m_swap_pieces);
 
+	m_pass = new JMenuItem("Pass");
+        m_pass.addActionListener(m_listener);
+        m_pass.setActionCommand("game_pass");
+	menu.add(m_pass);
+
 	m_resign = new JMenuItem("Resign");
         m_resign.addActionListener(m_listener);
         m_resign.setActionCommand("game_resign");
@@ -614,7 +619,7 @@ public final class GuiMenuBar
     private JMenuItem m_connect_local, m_connect_remote, 
         m_disconnect, m_reconnect;
 
-    private JMenuItem m_resign, m_forfeit, m_swap_pieces, m_swap_sides, m_genmove;
+    private JMenuItem m_pass, m_resign, m_forfeit, m_swap_pieces, m_swap_sides, m_genmove;
 
     private ButtonGroup m_bsGroup;    // board sizes
     private ButtonGroup m_btGroup;    // board view types (diamond, flat, etc)

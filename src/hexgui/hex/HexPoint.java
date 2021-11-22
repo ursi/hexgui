@@ -26,13 +26,14 @@ public final class HexPoint implements Comparable
     public static final HexPoint EAST;
     public static final HexPoint SWAP_SIDES;
     public static final HexPoint SWAP_PIECES;
+    public static final HexPoint PASS;
     public static final HexPoint RESIGN;
     public static final HexPoint FORFEIT;
     public static final HexPoint INVALID;
 
     public static final int MAX_WIDTH  = 19;
     public static final int MAX_HEIGHT = 19;
-    public static final int MAX_POINTS = MAX_WIDTH*MAX_HEIGHT + 9;
+    public static final int MAX_POINTS = MAX_WIDTH*MAX_HEIGHT + 10;
 
     public static final int DEFAULT_SIZE = 11;
 
@@ -47,16 +48,17 @@ public final class HexPoint implements Comparable
 	FORFEIT     = s_points[2] = new HexPoint(2, "forfeit");
 	SWAP_SIDES  = s_points[3] = new HexPoint(3, "swap-sides");
 	SWAP_PIECES = s_points[4] = new HexPoint(4, "swap-pieces");
+	PASS        = s_points[5] = new HexPoint(5, "pass");
 
-	NORTH       = s_points[5] = new HexPoint(5, "north");
-	EAST        = s_points[6] = new HexPoint(6, "east");
-	SOUTH       = s_points[7] = new HexPoint(7, "south");
-	WEST        = s_points[8] = new HexPoint(8, "west");
+	NORTH       = s_points[6] = new HexPoint(6, "north");
+	EAST        = s_points[7] = new HexPoint(7, "east");
+	SOUTH       = s_points[8] = new HexPoint(8, "south");
+	WEST        = s_points[9] = new HexPoint(9, "west");
 
 	for (int y=0; y<MAX_HEIGHT; y++) {
 	    for (int x=0; x<MAX_WIDTH; x++) {
 		String name = "" + (char)('a' + x) + (y+1);
-		s_points[9 + y*MAX_WIDTH+ x] = new HexPoint(x, y, name);
+		s_points[10 + y*MAX_WIDTH+ x] = new HexPoint(x, y, name);
 	    }
 	}
     }
@@ -88,12 +90,12 @@ public final class HexPoint implements Comparable
 	assert(y >= 0);
 	assert(x < MAX_WIDTH);
 	assert(y < MAX_HEIGHT);
-	return s_points[9 + y*MAX_WIDTH + x];
+	return s_points[10 + y*MAX_WIDTH + x];
     }
     
     /** Returns the point with the given string representation.
 	Valid special moves include: "north", "south", "east", "west" 
-	"swap-sides", "swap-pieces", "resign", and "forfeit". 
+	"swap-sides", "swap-pieces", "pass", "resign", and "forfeit". 
 	@param name The name of the point to return
 	@return the point or <code>null</code> if <code>name</code> is invalid.
     */
@@ -146,8 +148,8 @@ public final class HexPoint implements Comparable
 
     private HexPoint(int p, String name)
     {
-        this.x = p & (MAX_WIDTH-1);
-        this.y = p / MAX_WIDTH;
+        this.x = (p-10) & (MAX_WIDTH-1);
+        this.y = (p-10) / MAX_WIDTH;
         m_string = name;
     }
 
