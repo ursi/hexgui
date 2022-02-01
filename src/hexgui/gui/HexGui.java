@@ -870,20 +870,36 @@ public final class HexGui
         new PreferencesDialog(this, m_preferences);
     }
 
+    /** Toggle the player to move, by explicit user request. This
+        also updates the PL property in the current node. */
     private void cmdToggleToMove()
+    {
+        this.toggleToMove();
+        m_current.setPlayerToMove(m_tomove);
+    }
+
+    /** Toggle the player to move, without setting the PL property */
+    private void toggleToMove()
     {
         m_tomove = m_tomove.otherColor();
         m_toolbar.setToMove(m_tomove.toString());
         m_menubar.setToMove(m_tomove.toString());
-        m_current.setPlayerToMove(m_tomove);
         setCursorType();
     }
 
+    /** Set the player to move, by explicit user request. This
+        also updates the PL property in the current node. */
     private void cmdSetToMove()
+    {
+        this.setToMove();
+        m_current.setPlayerToMove(m_tomove);
+    }
+
+    /** Set the player to move, without setting the PL property */
+    private void setToMove()
     {
         m_tomove = HexColor.get(m_menubar.getToMove());
         m_toolbar.setToMove(m_tomove.toString());
-        m_current.setPlayerToMove(m_tomove);
         setCursorType();
     }
 
@@ -1986,9 +2002,9 @@ public final class HexGui
         stopClock(m_tomove);
 
         if (m_guiboard.isYBoard()) {
-            cmdToggleToMove();
+            toggleToMove();
         } else if (m_current.getMove().getPoint() != HexPoint.SWAP_SIDES && m_current.getMove().getPoint() != HexPoint.RESIGN && m_current.getMove().getPoint() != HexPoint.FORFEIT) {
-            cmdToggleToMove();
+            toggleToMove();
         }
         startClock(m_tomove);
 
@@ -2296,32 +2312,9 @@ public final class HexGui
     
     private void determineColorToMove()
     {
-	if (m_current == m_root)
-        {
-            m_tomove = HexColor.BLACK;
-        }
-        else if (m_current.hasMove())
-        {
-            // If the PlayerToMove property is set, use it.
-            HexColor color = m_current.getPlayerToMove();
-            if (color != null) {
-                m_tomove = color;
-            } else {
-                // Otherwise, player to move is always opposite of
-                // last move (except for a swap-sides, resign, or
-                // forfeit move).
-                m_tomove = m_current.getMove().getColor();
-                if (m_guiboard.isYBoard() 
-                    || (m_current.getMove().getPoint() != HexPoint.SWAP_SIDES && m_current.getMove().getPoint() != HexPoint.RESIGN && m_current.getMove().getPoint() != HexPoint.FORFEIT))
-                    m_tomove = m_tomove.otherColor();
-            }
-        }
-        else if (m_current.hasSetup())
-        {
-            HexColor color = m_current.getPlayerToMove();
-            if (color != null)
-                m_tomove = color;
-        }
+        // Usually the game tree determines the color to move.              
+        HexColor color = m_current.getPlayerToMove();
+        m_tomove = color;
         m_toolbar.setToMove(m_tomove.toString());
         setCursorType();
     }

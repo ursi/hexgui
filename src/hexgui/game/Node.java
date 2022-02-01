@@ -286,6 +286,11 @@ public class Node
 	m_property.put(key, value);
     }
 
+    public void unsetSgfProperty(String key)
+    {
+	m_property.remove(key);
+    }
+
     /** Append the given string to the SGF property */
     public void appendSgfProperty(String key, String toadd)
     {
@@ -392,22 +397,71 @@ public class Node
     {
         m_label.add(str);
     }
+
+    /** Return the default player to move for the current node, i.e.,
+        the player who would be moving next if the PL property is not
+        set. For normal moves, passes, and swap-pieces, this is the
+        opponent of the player who made the move; for swap-sides, it
+        is the player who made the move; for the root node, it is
+        Black; for resign, forfeit, and setup moves, there is no
+        default, i.e., return null */
+    public HexColor defaultPlayerToMove()
+    {
+        if (this.hasMove()) {
+            HexPoint p = m_move.getPoint();
+            if (p == HexPoint.RESIGN || p == HexPoint.FORFEIT) {
+                return null;
+            } else if (p == HexPoint.SWAP_SIDES) {
+                return m_move.getColor();
+            } else {
+                return m_move.getColor().otherColor();
+            }
+        } else if (this.m_parent == null) {
+            // root node
+            return HexColor.BLACK;
+        } else {
+            // non-root setup node
+            return null;
+        }
+    }
     
-    /** Sets the PL property to the given color. */
+    /** Sets the PL property to the given color. For moves that have a
+        default, unset the property if the requested value is the
+        default. */
     public void setPlayerToMove(HexColor color)
     {
-        setSgfProperty("PL", (color == HexColor.BLACK) ? "B" : "W");
+        if (color == defaultPlayerToMove()) {
+            unsetSgfProperty("PL");
+        } else {
+            setSgfProperty("PL", (color == HexColor.BLACK) ? "B" : "W");
+        }
     }
 
-    /** Returns the color in the "PL" property, null otherwise. */
+    /** Compute the player to move, using the "PL" property if it is
+        set and the standard behavior otherwise. Never return null. */
     public HexColor getPlayerToMove()
     {
         String cstr = getSgfProperty("PL");
         if (cstr != null) {
-            if (cstr.equals("B")) return HexColor.BLACK;
-            if (cstr.equals("W")) return HexColor.WHITE; 
+            if (cstr.equals("B")) {
+                return HexColor.BLACK;
+            } else if (cstr.equals("W")) {
+                return HexColor.WHITE;
+            }
         }
-        return null;
+        HexColor color = defaultPlayerToMove();
+        if (color != null) {
+            return color;
+        }
+        if (this.hasMove()) {
+            HexPoint p = m_move.getPoint();
+            if (p == HexPoint.RESIGN || p == HexPoint.FORFEIT) {
+                if (m_parent != null) {
+                    return m_parent.getPlayerToMove();
+                }
+            }
+        }
+        return HexColor.BLACK;
     }
 
     //----------------------------------------------------------------------
