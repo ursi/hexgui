@@ -219,6 +219,9 @@ public final class HexGui
         } else if (cmd.equals("game_forfeit")) {
             end_setup();
             humanMove(new Move(HexPoint.get("forfeit"), m_tomove));
+        } else if (cmd.equals("game_addsetup")) {
+            end_setup();
+            addSetupNode();
         } else if (cmd.equals("genmove")) {
             end_setup();
 	    htpGenMove(m_tomove);
@@ -872,6 +875,7 @@ public final class HexGui
         m_tomove = m_tomove.otherColor();
         m_toolbar.setToMove(m_tomove.toString());
         m_menubar.setToMove(m_tomove.toString());
+        m_current.setPlayerToMove(m_tomove);
         setCursorType();
     }
 
@@ -879,6 +883,7 @@ public final class HexGui
     {
         m_tomove = HexColor.get(m_menubar.getToMove());
         m_toolbar.setToMove(m_tomove.toString());
+        m_current.setPlayerToMove(m_tomove);
         setCursorType();
     }
 
@@ -2005,6 +2010,19 @@ public final class HexGui
         }
     }
 
+    /** Add a new empty setup node as a child of the current
+        node. This allows the creation of consecutive setup nodes. */
+    private void addSetupNode()
+    {
+        Node setup = new Node();
+        m_current.addChild(setup);
+        m_current = setup;
+        m_current.markRecent();
+        refreshGuiForBoardState();
+        m_statusbar.setMessage("Added a new setup node");
+    }
+
+
     private void addSetupMove(Move move)
     {
         // if current node doesn't permit setup to be edited, create a
@@ -2020,7 +2038,6 @@ public final class HexGui
 
         // add the setup stone to the set of setup stones
         m_current.addSetup(move.getColor(), move.getPoint());
-        m_current.setPlayerToMove(m_tomove);
         
         m_guiboard.setColor(move.getPoint(), move.getColor());
         m_guiboard.paintImmediately();
@@ -2028,12 +2045,13 @@ public final class HexGui
         htpSetUpCurrentBoard();
         htpShowboard();
 
-        m_statusbar.setMessage("Added setup stone (" + move.getColor().toString() +
-                               ", " + move.getPoint().toString() + ")");
-
         setFrameTitle();
         m_current.markRecent();
         refreshGuiForBoardState();
+
+        m_statusbar.setMessage("Added setup stone (" + move.getColor().toString() +
+                               ", " + move.getPoint().toString() + ")");
+
     }
 
     //----------------------------------------------------------------------

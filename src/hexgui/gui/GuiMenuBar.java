@@ -232,6 +232,11 @@ public final class GuiMenuBar
         m_forfeit.setActionCommand("game_forfeit");
 	menu.add(m_forfeit);
 
+	m_addsetup = new JMenuItem("Add setup node");
+        m_addsetup.addActionListener(m_listener);
+        m_addsetup.setActionCommand("game_addsetup");
+	menu.add(m_addsetup);
+
         m_genmove = new JMenuItem("Generate Computer Move");
         m_genmove.addActionListener(m_listener);
         m_genmove.setActionCommand("genmove");
@@ -619,7 +624,7 @@ public final class GuiMenuBar
     private JMenuItem m_connect_local, m_connect_remote, 
         m_disconnect, m_reconnect;
 
-    private JMenuItem m_pass, m_resign, m_forfeit, m_swap_pieces, m_swap_sides, m_genmove;
+    private JMenuItem m_pass, m_resign, m_forfeit, m_swap_pieces, m_swap_sides, m_addsetup, m_genmove;
 
     private ButtonGroup m_bsGroup;    // board sizes
     private ButtonGroup m_btGroup;    // board view types (diamond, flat, etc)
