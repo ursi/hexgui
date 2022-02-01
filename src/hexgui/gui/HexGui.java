@@ -2032,6 +2032,7 @@ public final class HexGui
                                ", " + move.getPoint().toString() + ")");
 
         setFrameTitle();
+        m_current.markRecent();
         refreshGuiForBoardState();
     }
 
