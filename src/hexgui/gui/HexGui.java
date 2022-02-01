@@ -2031,6 +2031,7 @@ public final class HexGui
                                ", " + move.getPoint().toString() + ")");
 
         setFrameTitle();
+        refreshGuiForBoardState();
     }
 
     //----------------------------------------------------------------------
@@ -2606,7 +2607,10 @@ public final class HexGui
 	    m_guiboard.initSize(m_gameinfo.getBoardSize());
             htpBoardsize(m_guiboard.getBoardSize());
 
-	    forward(1000);
+            // Play the root node, since it may contain setup.
+            playNode(m_root);
+            
+	    forward(-1);
 
 	    m_file = file;
 	    resetGameChanged();
