@@ -150,6 +150,11 @@ public class Node
 	    child.setPrev(cur);
 	}
     }
+
+    public boolean hasChild()
+    {
+        return m_child != null;
+    }
     
     /** Returns the number of children of this node. */
     public int numChildren()
@@ -351,10 +356,27 @@ public class Node
         return points;
     }
 
+    /** Determine whether the current node has any setup moves */
     public boolean hasSetup()
     {
         return !m_setup.isEmpty();
     }
+
+    /** Determine whether the current node can accept updates to setup
+        moves. This happens if the node has no m_move and no children.
+        In particular, setup is permitted on the root node (which
+        never has an m_move). */
+    public boolean canSetup()
+    {
+        if (this.hasMove()) {
+            return false;
+        }
+        if (this.hasChild()) {
+            return false;
+        }
+        return true;            
+    }
+    
     
     public boolean hasLabel()
     {

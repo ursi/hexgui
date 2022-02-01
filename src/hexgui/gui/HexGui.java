@@ -2007,8 +2007,9 @@ public final class HexGui
 
     private void addSetupMove(Move move)
     {
-        // if current node doesn't have setup info, create a setup node
-        if (!m_current.hasSetup())
+        // if current node doesn't permit setup to be edited, create a
+        // setup node.
+        if (!m_current.canSetup())
         {
             Node setup = new Node();
             m_current.addChild(setup);
