@@ -65,9 +65,26 @@ public final class SgfWriter
 
 	}
 
-	if (node.getMove() != null)
+	if (node.getMove() != null) {
 	    printMove(node.getMove());
+        }
 
+	Map<String,String> map = node.getProperties();
+	Iterator<Map.Entry<String,String> >  it = map.entrySet().iterator();
+	while(it.hasNext()) {
+	    Map.Entry<String,String> e = it.next();
+            if (!(e.getKey().equals("C") && e.getValue().equals(""))) {
+                String val = e.getValue();
+                if (e.getKey().equals("C")) {
+                    // For now we only escape comments, although there
+                    // may be other text values that should be escaped
+                    // too. Avoids escaping the ":" in AP field.
+                    val = escapeString(val);
+                }
+                print(e.getKey() + "[" + val + "]");
+            }
+	}
+	
         if (node.hasSetup()) {
             Vector<HexPoint> list;
             list = node.getSetup(HexColor.BLACK);
@@ -87,22 +104,6 @@ public final class SgfWriter
             }
         }
 
-	Map<String,String> map = node.getProperties();
-	Iterator<Map.Entry<String,String> >  it = map.entrySet().iterator();
-	while(it.hasNext()) {
-	    Map.Entry<String,String> e = it.next();
-            if (!(e.getKey().equals("C") && e.getValue().equals(""))) {
-                String val = e.getValue();
-                if (e.getKey().equals("C")) {
-                    // For now we only escape comments, although there
-                    // may be other text values that should be escaped
-                    // too. Avoids escaping the ":" in AP field.
-                    val = escapeString(val);
-                }
-                print(e.getKey() + "[" + val + "]");
-            }
-	}
-	
 	int num = node.numChildren();
 	if (num == 0) return;
 
