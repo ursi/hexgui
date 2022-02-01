@@ -31,10 +31,26 @@ public class Node
     */
     public Node(Move move)
     {
+        // Properties. This can include unstructured properties found
+        // in SGF files (i.e., properties that HexGUI doesn't know
+        // about), as well as structured properties such as C
+        // (comment), PL (player to move), and maybe
+        // others. Properties that can take multiple values are not
+        // stored here; e.g., LB is stored in m_label.
 	m_property = new TreeMap<String, String>();
+
+        // For setup moves.
         m_setup = new TreeMap<HexPoint,HexColor>();
+
+        // A list of cell:label pairs can be attached to a node. This
+        // corresponds to the SGF LB property.
         m_label = new Vector<String>();
+
+        // When navigating the tree, the "recent" child of each parent
+        // is the one that the "forward" button will navigate to.
         m_recent = false;
+
+        // This node's move.
 	setMove(move);
     }
 
@@ -78,7 +94,7 @@ public class Node
         }
     }
 
-    /** Moves this node to the end of its sibling list. */
+    /** Moves this node to the start of its sibling list. */
     public void moveToFirst()
     {
         Node parent = getParent();
@@ -101,7 +117,7 @@ public class Node
     }
 
     /** Adds a child to the beginning of the list of children. 
-        @param child Node to be added to end of list.
+        @param child Node to be added to start of list.
     */     
     public void addFirstChild(Node child) 
     {
@@ -212,7 +228,8 @@ public class Node
         return m_child;
     }
 
-    /** Returns the child that contains <code>node</code> in its subtree. */
+    /** Returns the child that contains <code>node</code> in its subtree.
+        Currently unused. */
     public Node getChildContainingNode(Node node)
     {
 	for (int i=0; i<numChildren(); i++) {
@@ -241,8 +258,9 @@ public class Node
         return depth;
     }
 
-    /** Determines if a swap move is allowed at this node.
-        Returns <code>true</code> if we are on move #2. 
+    /** Determines if a swap move is allowed at this node.  Returns
+        <code>true</code> if we are on move #2.  However, this doesn't
+        make sense if the first move was setup or passing.
     */
     public boolean isSwapAllowed()
     {
@@ -263,6 +281,7 @@ public class Node
 	m_property.put(key, value);
     }
 
+    /** Append the given string to the SGF property */
     public void appendSgfProperty(String key, String toadd)
     {
         String old = m_property.get(key);

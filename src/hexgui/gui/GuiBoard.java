@@ -125,7 +125,7 @@ public final class GuiBoard
     }
     
     /** Sets the type of board drawer to use.  If <code>name</code> is
-	not one of the values because "Diamond" is is used.
+	not one of the known values, "Diamond" is used.
 	@param name one of ("Diamond", "Flat", "Flat2", "Go"). 
     */
     public void setDrawType(String name)
@@ -160,8 +160,8 @@ public final class GuiBoard
         repaint();
     }
 
-    /** Sets whether black on letters is on top or if white on 
-	numbers is on top.  If string is invalid defaults to positive
+    /** Sets whether black and letters is on top or if white and
+	numbers is on top.  If string is invalid defaults to positive.
 	@param orient either "Positive" or "Negative". 
     */
     public void setOrientation(String orient)
@@ -284,8 +284,9 @@ public final class GuiBoard
         repaint();
     }
 
-    /** Makes a copy of the current fields if the dirty flag is not already set,
-        and then sets the dirty flag to true. See clearMarks().
+    /** Makes a copy of the current fields if the dirty flag is not
+        already set, and then sets the dirty flag to true. See
+        clearMarks().
     */
     public void aboutToDirtyStones()
     {
@@ -464,6 +465,7 @@ public final class GuiBoard
         repaint();
     }
 
+    /** Check if the board is full */
     public boolean isBoardFull()
     {
         for (int x=0; x<m_field.length; x++) {
@@ -473,6 +475,8 @@ public final class GuiBoard
         return true;
     }
 
+    /** Change the pieces' colors without moving them. This is only
+        used in Y. */
     public void swapColors() 
     {
         for (int x=0; x<m_field.length; x++) {
@@ -486,9 +490,11 @@ public final class GuiBoard
         }
     }
 
+    /** Change the pieces' colors and move them. This is only used in
+        Hex. */
     public void swapPieces() 
     {
-        // Due to the weird way the data structures are setting up, it
+        // Due to the weird way the data structures are set up, it
         // is tricky to move pieces to another location on the board.
         // In particular, there is no O(1) way to find the HexField
         // attached to a given HexPoint.
@@ -533,7 +539,7 @@ public final class GuiBoard
     public void paintImmediately()
     {
         assert SwingUtilities.isEventDispatchThread();
-	super.paintImmediately(0, 0, getWidth(),getHeight());
+	super.paintImmediately(0, 0, getWidth(), getHeight());
     }
 
     /** Displays this vc on the board. */
