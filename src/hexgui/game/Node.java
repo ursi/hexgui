@@ -389,6 +389,26 @@ public class Node
     }
 
     //----------------------------------------------------------------------
+    // Debugging output
+
+    /** Print information about self */
+    public void printDebug()
+    {
+        System.out.println("(");
+        System.out.println("move: " + m_move);
+        System.out.println("setup: " + m_setup);
+        System.out.println("label: " + m_label);
+        System.out.println("property: " + m_property);
+        System.out.println("recent: " + m_recent);
+        Node cur = m_child;
+        while (cur != null) {
+            cur.printDebug();
+            cur = cur.getNext();
+        }
+        System.out.println(")");
+    }
+    
+    //----------------------------------------------------------------------
 
     private TreeMap<String,String> m_property;
 

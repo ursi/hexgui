@@ -22,6 +22,12 @@ public final class Move
 	m_color = c;
     }
 
+    /** Convert to string */
+    public String toString()
+    {
+        return "Move(" + m_point + ", " + m_color + ")";
+    }
+    
     /** Determines whether this move is equal to the given move. 
 	@param other move to compare it to.
 	@return true if points and colors are equal, false otherwise.
