@@ -62,13 +62,35 @@ public class GuiField
 	return width / 17 + 1;
     }
 
-    public void clearAttributes() { m_attributes = 0; }
-    public void clearAttributes(int f) { m_attributes &= ~f; };
-    public void setAttributes(int f)   { m_attributes |= f; }
-    public int getAttributes() { return m_attributes; }
+    public void clearAttributes()
+    {
+        m_attributes = 0;
+    }
+    
+    public void clearAttributes(int f)
+    {
+        m_attributes &= ~f;
+    }
+    
+    public void setAttributes(int f)
+    {
+        m_attributes |= f;
+    }
+
+    public int getAttributes()
+    {
+        return m_attributes;
+    }
  
-    public void setColor(HexColor c) { m_color = c; }
-    public HexColor getColor() { return m_color; }
+    public void setColor(HexColor c)
+    {
+        m_color = c;
+    }
+    
+    public HexColor getColor()
+    {
+        return m_color;
+    }
 
     public void setText(String str)
     {
@@ -79,8 +101,9 @@ public class GuiField
             setAttributes(DRAW_TEXT);
     }
 
-    public String getText() { return m_text; }
-
+    public String getText() {
+        return m_text;
+    }
 
     public void setAlphaColor(Color c)
     {
@@ -102,20 +125,29 @@ public class GuiField
 	    setAttributes(DRAW_ALPHA);
     }
 
-    public Color getAlphaColor() { return m_alpha_color; }
+    public Color getAlphaColor() {
+        return m_alpha_color;
+    }
 
-    public float getAlphaBlend() { return m_alpha_blend; }
+    public float getAlphaBlend() {
+        return m_alpha_blend;
+    }
 
     public void setSelected(boolean f) 
     { 
-        if (f) 
+        if (f) {
             setAttributes(SELECTED);
-        else
+        } else {
             clearAttributes(SELECTED);
+        }
     }
 
-    public void setPoint(HexPoint p) { m_point = p; }
-    public HexPoint getPoint() { return m_point; }
+    public void setPoint(HexPoint p) {
+        m_point = p;
+    }
+    public HexPoint getPoint() {
+        return m_point;
+    }
     
     public void clear()
     {
@@ -152,27 +184,30 @@ public class GuiField
 	m_margin = getStoneMargin(m_radius*2);
 
 	m_graphics = g.create(x-w/2,y-h/2,w,h);
-	if (m_graphics instanceof Graphics2D)
+	if (m_graphics instanceof Graphics2D) {
 	    m_graphics2D = (Graphics2D)m_graphics;
-	else 
+        } else {
 	    m_graphics2D = null;
+        }
 	
-	if (m_color == HexColor.WHITE) 
+	if (m_color == HexColor.WHITE) {
 	    drawStone(COLOR_STONE_WHITE, COLOR_STONE_WHITE_BRIGHT);
-	else if (m_color == HexColor.BLACK)
+        } else if (m_color == HexColor.BLACK) {
 	    drawStone(COLOR_STONE_BLACK, COLOR_STONE_BLACK_BRIGHT);
-
-	if ((m_attributes & LAST_PLAYED) != 0) 
+        }
+        
+	if ((m_attributes & LAST_PLAYED) != 0) {
 	    drawLastPlayed();
+        }
 
-        if ((m_attributes & SWAP_PLAYED) != 0)
+        if ((m_attributes & SWAP_PLAYED) != 0) {
             drawSwapPlayed();
+        }
 
-        // FIXME: this is done in BoardDrawer since we don't know anything about
-        // our shape and size and we want to cover the entire field.
-        // Should all drawing be done in board drawer?
-        // 	if ((m_attributes & DRAW_ALPHA) != 0) 
-        // 	    drawAlpha();
+        // FIXME: this is done in BoardDrawer since we don't know
+        // anything about our shape and size and we want to cover the
+        // entire field.  Should all drawing be done in board drawer?
+        // if ((m_attributes & DRAW_ALPHA) != 0) drawAlpha();
 
         if ((m_attributes & DRAW_TEXT) != 0)
             drawText();

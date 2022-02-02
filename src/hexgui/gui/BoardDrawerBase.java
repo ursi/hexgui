@@ -30,16 +30,17 @@ import java.net.URL;
 /** Base class for board drawing.
 
     <p>Board drawers are responsible for drawing the background,
-    labels, field outlines, and stone shadows.  In addition, they are
-    also responsible for determining the the actual position of each
+    labels, field outlines, and stone shadows.  In addition, they
+    are also responsible for determining the actual position of each
     field in the window.  Field contents (i.e. stones, markers,
     numerical values, etc) are not drawn, they are drawn with the
     GuiField class.
 
     <p>Board sizes supported are <code>m x n</code> where
-    <code>m</code> and <code>n</code> range from 1 to 26.  By default,
-    black connects top and bottom and should be labeled with letters.
-    White connects left and right and should be labeled with numbers.
+    <code>m</code> and <code>n</code> range from 1 to 26.  By
+    default, black connects top and bottom and should be labeled with
+    letters.  White connects left and right and should be labeled with
+    numbers.
 */
 public abstract class BoardDrawerBase
 {
@@ -49,9 +50,10 @@ public abstract class BoardDrawerBase
 	m_aspect_ratio = 1.0;
     }
 
-    /** Loads the image in <code>filename</code> and sets it as the background.
-	If <code>filename</code> does not exist no background image is 
-	displayed.  Image will be scaled to fit the window.
+    /** Loads the image in <code>filename</code> and sets it as the
+	background.  If <code>filename</code> does not exist no
+	background image is displayed.  Image will be scaled to fit
+	the window.
 	@param filename filename of the image to use as a background.
     */
     public void loadBackground(String filename)
