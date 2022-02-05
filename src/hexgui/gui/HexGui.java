@@ -1941,7 +1941,6 @@ public final class HexGui
     {
         // Count the number of pieces on the board.
         int count = m_guiboard.numberOfPieces();
-        System.out.println("### Number of pieces: " + count);
         // Check whether the game tree allows swapping.
         boolean isswap = m_current.isSwap();
         return count == 1 && !isswap;
