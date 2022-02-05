@@ -1875,6 +1875,10 @@ public final class HexGui
                 {
                     humanMove(new Move(point, m_tomove));
                 }
+                else if (isSwapAllowed())
+                {
+                    humanMove(new Move(HexPoint.get("swap-pieces"), m_tomove));
+                }
             }
             else if (context.equals("black"))
             {
