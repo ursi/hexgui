@@ -19,6 +19,7 @@ import java.awt.Graphics2D;
 import java.awt.AlphaComposite;
 import java.awt.Image;
 import java.awt.FontMetrics;
+import java.awt.Font;
 import java.awt.RenderingHints;
 import java.awt.Graphics;
 
@@ -236,12 +237,19 @@ public abstract class BoardDrawerBase
 
     protected void drawLabel(Graphics g, Point p, String string, int xoff)
     {
-	FontMetrics fm = g.getFontMetrics();
+        double size = Math.min(m_fieldWidth, m_fieldHeight) * 0.4;
+        Font f = g.getFont();
+        Font f2 = f.deriveFont((float)size);
+
+        FontMetrics fm = g.getFontMetrics(f2);
 	int width = fm.stringWidth(string);
 	int height = fm.getAscent();
-	int x = width/2;
+
+        g.setFont(f2);
+        int x = width/2;
 	int y = height/2;
 	g.drawString(string, p.x + xoff - x, p.y + y); 
+        g.setFont(f);
     }
 
     protected abstract void drawLabels(Graphics g, boolean alphatop);

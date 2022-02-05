@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.AlphaComposite;
 import java.awt.FontMetrics;
+import java.awt.Font;
 
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -234,17 +235,34 @@ public class GuiField
     private void drawLastPlayed()
     {
 	m_graphics.setColor(Color.gray);
-	m_graphics.fillOval(m_width/2 - 2, m_height/2 - 2, 4, 4);
+        int size = (m_radius - m_margin) / 8;
+	m_graphics.fillOval(m_width/2 - size, m_height/2 - size, 2*size, 2*size);
     }
 
+    /** Draw the given string centered at the coordinates (x,y) in the
+        current font, with the given relative size. */
+    private void drawString(String str, double x, double y, double size)
+    {
+        double abssize = (m_radius - m_margin) * size;
+        Font f = m_graphics.getFont();
+        Font f2 = f.deriveFont((float)abssize);
+        FontMetrics m = m_graphics.getFontMetrics(f2);
+        double width = m.stringWidth(str);
+        double height = m.getAscent();
+        
+        m_graphics.setFont(f2);
+        m_graphics.drawString(str, (int)(x - width/2), (int)(y + 0.8*height/2));
+        m_graphics.setFont(f);
+    }
+    
     private void drawSwapPlayed()
     {
         if (m_color == HexColor.BLACK) {
             m_graphics.setColor(Color.white);
         } else {
             m_graphics.setColor(Color.black);
-        }            
-        m_graphics.drawString("S", m_width/2-3, m_height/2+3);
+        }
+        this.drawString("S", m_width/2.0, m_height/2.0, 1);
     }
 
     private void drawAlpha()
@@ -265,22 +283,24 @@ public class GuiField
 
     private void drawText()
     {
-	FontMetrics fm = m_graphics.getFontMetrics();
-        int height = fm.getAscent();
-        
         String[] lines = m_text.split("@");
-        int y = m_height/2 + (lines.length*height)/2;
+        int nlines = lines.length;
+        
+        double size = m_radius - m_margin;
+        double relheight = nlines > 1 ? 2.0/nlines : 1.0;
+        double height = size * relheight;
+        
+        double y = m_height/2 + ((nlines-1)*height)/2;
 
         for (int i=lines.length-1; i>=0; --i) {
             String str = lines[i].trim();
-            int width = fm.stringWidth(str);
 
             Color color = Color.black;
             if (getColor() == HexColor.BLACK)
                 color = Color.white;
 
             m_graphics.setColor(color);
-            m_graphics.drawString(str, m_width/2-width/2, y);
+            this.drawString(str, m_width/2, y, relheight);
 
             y -= height;
         }
