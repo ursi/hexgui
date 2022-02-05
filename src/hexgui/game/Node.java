@@ -263,14 +263,15 @@ public class Node
         return depth;
     }
 
-    /** Determines if a swap move is allowed at this node.  Returns
-        <code>true</code> if we are on move #2.  However, this doesn't
-        make sense if the first move was setup or passing.
-    */
-    public boolean isSwapAllowed()
+    /** Determines if the current node is a swap node */
+    public boolean isSwap()
     {
-        if (getDepth() == 1) return true;
-        return false;
+        if (this.hasMove()) {
+            HexPoint p = m_move.getPoint();
+            return p == HexPoint.SWAP_SIDES || p == HexPoint.SWAP_PIECES;
+        } else {
+            return false;
+        }
     }
 
     //----------------------------------------------------------------------

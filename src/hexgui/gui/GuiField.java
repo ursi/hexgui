@@ -235,7 +235,7 @@ public class GuiField
     private void drawLastPlayed()
     {
 	m_graphics.setColor(Color.gray);
-        int size = (m_radius - m_margin) / 8;
+        int size = (m_radius - m_margin) / 6;
 	m_graphics.fillOval(m_width/2 - size, m_height/2 - size, 2*size, 2*size);
     }
 

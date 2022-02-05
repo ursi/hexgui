@@ -62,7 +62,7 @@ public final class GuiMenuBar
 	}
     }
 
-    public void updateMenuStates(Node current)
+    public void updateMenuStates(HexGui current)
     {
         m_swap_pieces.setEnabled(current.isSwapAllowed());
         m_swap_sides.setEnabled(current.isSwapAllowed());

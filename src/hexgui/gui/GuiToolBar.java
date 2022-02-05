@@ -97,7 +97,7 @@ public final class GuiToolBar
         m_program_options.setEnabled(f);
     }
     
-    public void updateButtonStates(Node node)
+    public void updateButtonStates(Node node, HexGui gui)
     {
 	m_beginning.setEnabled(node.getParent() != null);
 	m_back10.setEnabled(node.getParent() != null);
@@ -110,7 +110,7 @@ public final class GuiToolBar
 	m_up.setEnabled(node.getPrev() != null);
 	m_down.setEnabled(node.getNext() != null);
 
-        m_swap.setEnabled(node.isSwapAllowed());
+        m_swap.setEnabled(gui.isSwapAllowed());
     }
 
     public void lockToolbar()
@@ -146,7 +146,7 @@ public final class GuiToolBar
         enableStopButton();
     }
 
-    public void unlockToolbar(Node node)
+    public void unlockToolbar(Node node, HexGui gui)
     {
         disableStopButton();
 
@@ -165,7 +165,7 @@ public final class GuiToolBar
         m_solve.setEnabled(true);
         m_program_options.setEnabled(true);
        
-        updateButtonStates(node);
+        updateButtonStates(node, gui);
     }
 
     //----------------------------------------------------------------------

@@ -742,8 +742,8 @@ public final class HexGui
 	    m_preferences.put("gui-board-width", dim.width);
 	    m_preferences.put("gui-board-height", dim.height);
 
-	    m_toolbar.updateButtonStates(m_current);
-            m_menubar.updateMenuStates(m_current);
+	    m_toolbar.updateButtonStates(m_current, this);
+            m_menubar.updateMenuStates(this);
 
             htpBoardsize(m_guiboard.getBoardSize());
             htpShowboard();
@@ -1053,7 +1053,7 @@ public final class HexGui
 
     private void unlockGUI()
     {
-        m_toolbar.unlockToolbar(m_current);
+        m_toolbar.unlockToolbar(m_current, this);
         m_locked = false;
     }
 
@@ -1937,6 +1937,16 @@ public final class HexGui
 	markLastPlayedStone();
     }
 
+    public boolean isSwapAllowed()
+    {
+        // Count the number of pieces on the board.
+        int count = m_guiboard.numberOfPieces();
+        System.out.println("### Number of pieces: " + count);
+        // Check whether the game tree allows swapping.
+        boolean isswap = m_current.isSwap();
+        return count == 1 && !isswap;
+    }
+    
     private void play(Move move)
     {
         // see if variation already exists; if so, do not add a duplicate
@@ -1961,7 +1971,7 @@ public final class HexGui
         {
             if (move.getPoint() == HexPoint.SWAP_SIDES || move.getPoint() == HexPoint.SWAP_PIECES)
             {
-                if (!m_current.isSwapAllowed())
+                if (!this.isSwapAllowed())
                 {
                     ShowError.msg(this, "Swap move not allowed!");
                     return;
@@ -2009,8 +2019,8 @@ public final class HexGui
         startClock(m_tomove);
 
         guiPlay(move);
-	m_toolbar.updateButtonStates(m_current);
-        m_menubar.updateMenuStates(m_current);
+	m_toolbar.updateButtonStates(m_current, this);
+        m_menubar.updateMenuStates(this);
         m_statusbar.setMessage(m_current.getDepth() + " " 
                                + move.getColor().toString() + " " 
                                + move.getPoint().toString());
@@ -2195,8 +2205,8 @@ public final class HexGui
     {
 	markLastPlayedStone();
 	m_guiboard.repaint();
-	m_toolbar.updateButtonStates(m_current);
-        m_menubar.updateMenuStates(m_current);
+	m_toolbar.updateButtonStates(m_current, this);
+        m_menubar.updateMenuStates(this);
         setFrameTitle();
 
         setComment(m_current);
@@ -2299,8 +2309,8 @@ public final class HexGui
         backward(1);
 
         to_be_deleted.removeSelf();
-	m_toolbar.updateButtonStates(m_current);
-        m_menubar.updateMenuStates(m_current);
+	m_toolbar.updateButtonStates(m_current, this);
+        m_menubar.updateMenuStates(this);
         setFrameTitle();
     }
 
@@ -2325,7 +2335,7 @@ public final class HexGui
     {
         if (m_current == m_root || !m_current.hasMove())
         {
-            m_guiboard.markSwapPlayed(null);
+            m_guiboard.clearSwapPlayed();
 	    m_guiboard.markLastPlayed(null);
             return;
         }
@@ -2334,7 +2344,7 @@ public final class HexGui
 
         if (move.getPoint() == HexPoint.RESIGN || move.getPoint() == HexPoint.FORFEIT || move.getPoint() == HexPoint.PASS)
         {
-            m_guiboard.markSwapPlayed(null);
+            m_guiboard.clearSwapPlayed();
 	    m_guiboard.markLastPlayed(null);
             return;
         }
@@ -2345,7 +2355,7 @@ public final class HexGui
             assert(parent != null);
 
             m_guiboard.markLastPlayed(null);
-            m_guiboard.markSwapPlayed(parent.getMove().getPoint());
+            m_guiboard.markSwapPlayed();
         }
         else if (move.getPoint() == HexPoint.SWAP_PIECES)
         {
@@ -2353,12 +2363,12 @@ public final class HexGui
             assert(parent != null);
 
             m_guiboard.markLastPlayed(null);
-            m_guiboard.markSwapPlayed(parent.getMove().getPoint().reflect());
+            m_guiboard.markSwapPlayed();
         }
         else
         {
             m_guiboard.markLastPlayed(move.getPoint());
-            m_guiboard.markSwapPlayed(null);
+            m_guiboard.clearSwapPlayed();
         }
     }
 

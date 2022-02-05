@@ -324,18 +324,20 @@ public final class GuiBoard
     public void clearMarks()
     {
         if (m_dirty_stones) {
-            for (int i=0; i<m_field.length; i++) 
+            for (int i=0; i<m_field.length; i++) {
                 m_field[i] = new GuiField(m_backup_field[i]);
+            }
         }
         m_dirty_stones = false;
         
         clearArrows();
         
-	for (int x=0; x<m_field.length; x++) 
+	for (int x=0; x<m_field.length; x++) {
 	    m_field[x].clearAttributes(GuiField.LAST_PLAYED | 
                                        GuiField.SWAP_PLAYED | 
                                        GuiField.DRAW_TEXT | 
                                        GuiField.DRAW_ALPHA);
+        }
         repaint();
     }
 
@@ -387,35 +389,41 @@ public final class GuiBoard
     /** Marks the given point to show which move was played last, or
         clears the mark if <code>point</code> is <code>null</code>. */
 
-    // FIXME: don't store the last played move here, just get it from
-    //        the game tree. 
-
     public void markLastPlayed(HexPoint point)
     {
         assert(point != HexPoint.SWAP_SIDES && point != HexPoint.SWAP_PIECES);
 
-	if (m_last_played != null) 
+	if (m_last_played != null) {
 	    m_last_played.clearAttributes(GuiField.LAST_PLAYED);
+            m_last_played = null;
+        }
 	if (point != null) {
 	    m_last_played = getField(point);
-	    m_last_played.setAttributes(GuiField.LAST_PLAYED);
-	} else {
-	    m_last_played = null;
+            if (m_last_played != null) {
+                m_last_played.setAttributes(GuiField.LAST_PLAYED);
+            }
 	}
         repaint();
     }
 
-    /** Marks the given point to show which move was swapped. */
-    public void markSwapPlayed(HexPoint point)
+    /** Clear swap marks */
+    public void clearSwapPlayed()
     {
-        if (point == null) {
-            if (m_swap_played != null) {
-                m_swap_played.clearAttributes(GuiField.SWAP_PLAYED);
-                m_swap_played = null;
+        for (int x=0; x<m_field.length; x++) {
+            m_field[x].clearAttributes(GuiField.SWAP_PLAYED);
+        }
+        repaint();
+    }
+        
+    /** Add swap mark to all pieces on the board (hopefully there is
+     * exactly one of them */
+    public void markSwapPlayed()
+    {
+        for (int x=0; x<m_field.length; x++) {
+            HexPoint p = m_field[x].getPoint();
+            if (p.is_cell() && m_field[x].getColor() != HexColor.EMPTY) {
+                m_field[x].setAttributes(GuiField.SWAP_PLAYED);
             }
-        } else {
-            m_swap_played = getField(point);
-            m_swap_played.setAttributes(GuiField.SWAP_PLAYED);
         }
         repaint();
     }
@@ -475,6 +483,24 @@ public final class GuiBoard
         return true;
     }
 
+    /** Count the number of pieces on the board */
+    public int numberOfPieces()
+    {
+        int count = 0;
+        for (int x=0; x<m_field.length; x++) {
+            HexPoint point = m_field[x].getPoint();
+            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
+                point == HexPoint.SOUTH || point == HexPoint.WEST) {
+                continue;
+            }
+            if (m_field[x].getColor() != HexColor.EMPTY) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    
     /** Change the pieces' colors without moving them. This is only
         used in Y. */
     public void swapColors() 
@@ -737,7 +763,6 @@ public final class GuiBoard
     private GuiField m_backup_field[];
 
     private GuiField m_last_played;
-    private GuiField m_swap_played;
 
     private BoardDrawerBase m_drawer;
     private BoardPanel m_boardPanel;

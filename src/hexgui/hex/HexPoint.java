@@ -104,9 +104,11 @@ public final class HexPoint implements Comparable
         if (name.equalsIgnoreCase("swap"))
             return SWAP_SIDES;
 
-        for (int x=0; x<MAX_POINTS; x++) 
-            if (name.equalsIgnoreCase(s_points[x].toString()))
+        for (int x=0; x<MAX_POINTS; x++) {
+            if (name.equalsIgnoreCase(s_points[x].toString())) {
                 return s_points[x];
+            }
+        }
         assert(false);
 	return null;
     }
@@ -148,8 +150,8 @@ public final class HexPoint implements Comparable
 
     private HexPoint(int p, String name)
     {
-        this.x = (p-10) & (MAX_WIDTH-1);
-        this.y = (p-10) / MAX_WIDTH;
+        this.x = -1;
+        this.y = p-10;
         m_string = name;
     }
 
@@ -160,12 +162,21 @@ public final class HexPoint implements Comparable
 	m_string = name;
     }
 
-    // return the HexPoint that is opposite to this one, across the
-    // long diagonal.
+    /** return the HexPoint that is opposite to this one, across the
+        long diagonal. */
     public HexPoint reflect()
     {
         return HexPoint.get(this.y, this.x);
     }
+
+    /** return true is the point is a ordinary cell on the board (i.e.,
+     * not something like NORTH, SWAP_SIDES, PASS, RESIGN, etc */
+    public boolean is_cell()
+    {
+        return this.x >= 0;
+    }
+
+    
     
     public final int x, y;
     private final String m_string;
