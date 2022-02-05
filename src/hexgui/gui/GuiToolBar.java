@@ -269,7 +269,7 @@ public final class GuiToolBar
 	m_toolBar.addSeparator();
 
 	m_swap = makeButton("hexgui/images/swap.png",
-			    "game_swap_sides",
+			    "game_swap_pieces",
 			    "Play swap move",
 			    "Swap",
                             KeyEvent.VK_S);

@@ -207,15 +207,15 @@ public final class GuiMenuBar
 
         menu.addSeparator();
 
-        m_swap_sides = new JMenuItem("Swap sides");
-        m_swap_sides.addActionListener(m_listener);
-        m_swap_sides.setActionCommand("game_swap_sides");
-        menu.add(m_swap_sides);
-
         m_swap_pieces = new JMenuItem("Swap pieces");
         m_swap_pieces.addActionListener(m_listener);
         m_swap_pieces.setActionCommand("game_swap_pieces");
         menu.add(m_swap_pieces);
+
+        m_swap_sides = new JMenuItem("Swap sides");
+        m_swap_sides.addActionListener(m_listener);
+        m_swap_sides.setActionCommand("game_swap_sides");
+        menu.add(m_swap_sides);
 
 	m_pass = new JMenuItem("Pass");
         m_pass.addActionListener(m_listener);
