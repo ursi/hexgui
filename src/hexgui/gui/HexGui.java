@@ -2044,6 +2044,7 @@ public final class HexGui
     private void addSetupNode()
     {
         Node setup = new Node();
+        setup.setPlayerToMove(m_tomove);
         m_current.addChild(setup);
         m_current = setup;
         m_current.markRecent();
@@ -2055,12 +2056,14 @@ public final class HexGui
     private void addSetupMove(Move move)
     {
         // if current node doesn't permit setup to be edited, create a
-        // setup node.
+        // new setup node.
         if (!m_current.canSetup())
         {
             Node setup = new Node();
+            setup.setPlayerToMove(m_tomove);
             m_current.addChild(setup);
             m_current = setup;
+
         }
 
         m_guiboard.clearMarks();
