@@ -1202,6 +1202,7 @@ public final class HexGui
         }
         if (move.getPoint() == HexPoint.SWAP_PIECES) {
             htpSetUpCurrentBoard();
+            return;
         }
 	sendCommand("play " + move.getColor().toString() +
 		    " " + move.getPoint().toString() + "\n", null);
