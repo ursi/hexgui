@@ -270,7 +270,7 @@ public final class HexGui
         else if (cmd.equals("program_options"))
         {
             AnalyzeCommand command;
-            if (m_white_name.equalsIgnoreCase("Mohex"))
+            if (m_white_name.equalsIgnoreCase("Mohex") || m_white_name.equalsIgnoreCase("HexHex"))
             {
                 command = new AnalyzeCommand
                     (new AnalyzeDefinition("param/blah/param_mohex"));
