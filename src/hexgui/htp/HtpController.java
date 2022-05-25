@@ -96,6 +96,11 @@ public class HtpController
                 m_waiting = false;
                 throw new HtpError("IOException waiting for response!");
             }
+
+            // Since the response must, by definition of the GTP
+            // protocol, always end with two newline characters,
+            // remove them.
+            response = response.replaceAll("[\n\r]$", "");
             
             //System.out.println("got: '" + response + "'");
             
