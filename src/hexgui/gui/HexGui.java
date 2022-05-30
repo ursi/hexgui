@@ -2441,13 +2441,11 @@ public final class HexGui
     private boolean savePosition(File file)
     {
         Node root = new Node();
-        Node child = new Node();
-        root.addChild(child);
 
         GameInfo info = new GameInfo();
         info.setBoardSize(m_guiboard.getBoardSize());
-        m_guiboard.storePosition(child);
-        child.setPlayerToMove(m_tomove);
+        m_guiboard.storePosition(root);
+        root.setPlayerToMove(m_tomove);
         return save_tree(file, root, info);
     }
 
