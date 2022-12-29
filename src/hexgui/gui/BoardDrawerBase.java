@@ -82,7 +82,7 @@ public abstract class BoardDrawerBase
         m_excentricity_obtuse = 0.5;
         m_borderradius = 1.2;
         m_margin = 0.5;
-        m_labelradius = 1;
+        m_labelradius = 1.1;
 
         m_width = w;
         m_height = h;
@@ -445,7 +445,7 @@ public abstract class BoardDrawerBase
 
     protected void drawLabel(Graphics g, Point p, String string, int xoff)
     {
-        double size = Math.min(m_fieldWidth, m_fieldHeight) * 0.4;
+        double size = m_fieldSize * 0.4;
         Font f = g.getFont();
         Font f2 = f.deriveFont((float)size);
 
@@ -455,7 +455,7 @@ public abstract class BoardDrawerBase
 
         g.setFont(f2);
         int x = width/2;
-	int y = height/2;
+	int y = (int)(0.9 * height/2);
 	g.drawString(string, p.x + xoff - x, p.y + y); 
         g.setFont(f);
     }
