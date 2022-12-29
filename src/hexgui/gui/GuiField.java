@@ -63,6 +63,11 @@ public class GuiField
 	return width / 17 + 1;
     }
 
+    public static double getStoneMargin_new(double width)
+    {
+	return width / 17 + 1;
+    }
+
     public void clearAttributes()
     {
         m_attributes = 0;

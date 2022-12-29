@@ -12,6 +12,7 @@ import hexgui.hex.HexPoint;
 import java.util.Vector;
 import javax.swing.*;
 
+import java.awt.geom.Point2D;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Color;
@@ -140,6 +141,7 @@ public abstract class BoardDrawerBase
         m_drankY = -drY * scale;
         m_originX = w/2.0 - scale * (minX + maxX)/2;
         m_originY = h/2.0 + scale * (minY + maxY)/2;
+        m_fieldSize = scale;
     }
     
     /** Gets the field containing the specified point.
@@ -194,13 +196,14 @@ public abstract class BoardDrawerBase
             m_bheight = bw;
         }
         
-        setGeometry(w, h, bw, bh, 10, !m_alphaontop);
+        setGeometry(w, h, bw, bh, 9.8, !m_alphaontop);
         
 	computeFieldPlacement();
-	m_outline = calcCellOutlines(field);
+	m_outline = calcCellOutlines_new(field);
 
 	setAntiAliasing(g);
 	drawBackground(g);
+        drawEdges(g);
 	drawCells(g, field);
 	drawLabels(g, alphaontop);
 	drawShadows(g, field);
@@ -248,6 +251,25 @@ public abstract class BoardDrawerBase
     */
     protected abstract Polygon[] calcCellOutlines(GuiField field[]);
 
+    /** Calculate an array of hexagons representing the board's cells.
+	@param the fields it will need to draw
+     */
+    protected Polygon[] calcCellOutlines_new(GuiField field[])
+    {
+	Polygon outline[] = new Polygon[field.length];
+        for (int x = 0; x < outline.length; x++) {
+            HexPoint c = field[x].getPoint();
+            outline[x] = new Polygon();
+            addHexPoint(outline[x], c.x, c.y, 1, 0, 0, 0, 0);
+            addHexPoint(outline[x], c.x, c.y, 0, 1, 0, 0, 0);
+            addHexPoint(outline[x], c.x, c.y, 0, 0, 1, 0, 0);
+            addHexPoint(outline[x], c.x, c.y, -1, 0, 0, 0, 0);
+            addHexPoint(outline[x], c.x, c.y, 0, -1, 0, 0, 0);
+            addHexPoint(outline[x], c.x, c.y, 0, 0, -1, 0, 0);
+        }	
+	return outline;
+    }
+    
     /** Draws the outlines of the given fields. 
 	@param g graphics context to draw to.
 	@param field the list of fields to draw.
@@ -267,13 +289,12 @@ public abstract class BoardDrawerBase
 		g.drawPolygon(m_outline[i]);
 	    }
 	}
-        this.drawBoard(g);
     }
 
-    /** An auxiliary function for adding a point to a polygon, using
-     Hex coordinates. Here a is the file, b is the rank, c, d, e
-     are offsets, and r, theta is a polar coordinate. */
-    protected void addHexPoint(Polygon p, double a, double b, double c, double d, double e, double r, double theta)
+    /** An auxiliary function for finding a point with the given Hex
+     coordinates. Here a is the file, b is the rank, c, d, e are
+     offsets, and r, theta is a polar coordinate. */
+    protected Point2D.Double hexPoint(double a, double b, double c, double d, double e, double r, double theta)
     {
         double xr = r * Math.cos(Math.PI * theta / 180) * Math.sqrt(3);
         double yr = r * Math.sin(Math.PI * theta / 180);
@@ -283,28 +304,33 @@ public abstract class BoardDrawerBase
 
         double x = m_originX + m_dfileX * a + m_drankX * b;
         double y = m_originY + m_dfileY * a + m_drankY * b;
-        p.addPoint((int)x, (int)y);
+
+        return new Point2D.Double(x, y);
     }
+    
+    /** An auxiliary function for adding a point to a polygon, using
+     Hex coordinates. Here a is the file, b is the rank, c, d, e
+     are offsets, and r, theta is a polar coordinate. */
+    protected void addHexPoint(Polygon p, double a, double b, double c, double d, double e, double r, double theta)
+    {
+        Point2D.Double point = hexPoint(a, b, c, d, e, r, theta);
+        p.addPoint((int)point.x, (int)point.y);
+    }
+
+    protected Point getLocation_new(HexPoint p)
+    {
+        Point2D.Double pp = hexPoint(p.x, p.y, 0, 0, 0, 0, 0);
+        return new Point((int)pp.x, (int)pp.y);
+    }
+
     
     /** Draws the board, according to the current geometry, which must
         have been set with setGeometry.
         @param g graphics context to draw to.
     */
-    protected void drawBoard(Graphics g)
+    protected void drawEdges(Graphics g)
     {
-        // Hexagons
-        for (int a=0; a<m_bwidth_new; a++) {
-            for (int b=0; b<m_bheight_new; b++) {
-                Polygon p = new Polygon();
-                this.addHexPoint(p, a, b, 1, 0, 0, 0, 0);
-                this.addHexPoint(p, a, b, 0, 1, 0, 0, 0);
-                this.addHexPoint(p, a, b, 0, 0, 1, 0, 0);
-                this.addHexPoint(p, a, b, -1, 0, 0, 0, 0);
-                this.addHexPoint(p, a, b, 0, -1, 0, 0, 0);
-                this.addHexPoint(p, a, b, 0, 0, -1, 0, 0);
-                g.drawPolygon(p);
-            }
-        }
+	g.setColor(Color.black);
         // 1-edge.
 
         double r0 = m_borderradius - m_excentricity_acute/2;
@@ -314,54 +340,54 @@ public abstract class BoardDrawerBase
         // While the Graphics class can draw arc segments, it can't join them with other segments.
         // So we approximate the arc by a polygon.
         for (int theta = 90; theta <= 150; theta += 10) {
-            this.addHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
+            addHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
         }
         for (int a=0; a<m_bwidth_new; a++) {
-            this.addHexPoint(e1, a, 0, 0, -1, 0, 0, 0);
-            this.addHexPoint(e1, a, 0, 0, 0, -1, 0, 0);
+            addHexPoint(e1, a, 0, 0, -1, 0, 0, 0);
+            addHexPoint(e1, a, 0, 0, 0, -1, 0, 0);
         }
-        this.addHexPoint(e1, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
+        addHexPoint(e1, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
         for (int theta = 60; theta <= 90; theta += 10) {
-            this.addHexPoint(e1, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e1, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
         }
             
         Polygon e2 = new Polygon();
         for (int theta = 210; theta >= 150; theta -= 10) {
-            this.addHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
+            addHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
         }
         for (int b=0; b<m_bheight_new; b++) {
-            this.addHexPoint(e2, 0, b, 0, -1, 0, 0, 0);
-            this.addHexPoint(e2, 0, b, -1, 0, 0, 0, 0);
+            addHexPoint(e2, 0, b, 0, -1, 0, 0, 0);
+            addHexPoint(e2, 0, b, -1, 0, 0, 0, 0);
         }
-        this.addHexPoint(e2, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
+        addHexPoint(e2, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
         for (int theta = 240; theta >= 210; theta -= 10) {
-            this.addHexPoint(e2, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e2, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
         }
             
         Polygon e3 = new Polygon();
         for (int theta = -90; theta <= -30; theta += 10) {
-            this.addHexPoint(e3, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
+            addHexPoint(e3, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
         }
         for (int a=m_bwidth_new-1; a >= 0; a--) {
-            this.addHexPoint(e3, a, m_bheight_new-1, 0, 1, 0, 0, 0);
-            this.addHexPoint(e3, a, m_bheight_new-1, 0, 0, 1, 0, 0);
+            addHexPoint(e3, a, m_bheight_new-1, 0, 1, 0, 0, 0);
+            addHexPoint(e3, a, m_bheight_new-1, 0, 0, 1, 0, 0);
         }
-        this.addHexPoint(e3, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
+        addHexPoint(e3, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
         for (int theta = -120; theta <= -90; theta += 10) {
-            this.addHexPoint(e3, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e3, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
         }
             
         Polygon e4 = new Polygon();
         for (int theta = 30; theta >= -30; theta -= 10) {
-            this.addHexPoint(e4, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
+            addHexPoint(e4, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
         }
         for (int b=m_bheight_new-1; b >= 0; b--) {
-            this.addHexPoint(e4, m_bwidth_new-1, b, 0, 1, 0, 0, 0);
-            this.addHexPoint(e4, m_bwidth_new-1, b, 1, 0, 0, 0, 0);
+            addHexPoint(e4, m_bwidth_new-1, b, 0, 1, 0, 0, 0);
+            addHexPoint(e4, m_bwidth_new-1, b, 1, 0, 0, 0, 0);
         }
-        this.addHexPoint(e4, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
+        addHexPoint(e4, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
         for (int theta = 60; theta >= 30; theta -= 10) {
-            this.addHexPoint(e4, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e4, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
         }
             
         g.fillPolygon(e1);
@@ -450,7 +476,7 @@ public abstract class BoardDrawerBase
         for (int pos = 0; pos < field.length; pos++) {
 	    if (field[pos].getColor() == HexColor.EMPTY)
 		continue;
-	    Point location = getLocation(field[pos].getPoint());
+	    Point location = getLocation_new(field[pos].getPoint());
 	    graphics.setColor(Color.black);
 	    graphics.fillOval(location.x - size / 2 + offset,
 			      location.y - size / 2 + offset,
@@ -462,8 +488,8 @@ public abstract class BoardDrawerBase
     protected void drawFields(Graphics g, GuiField field[])
     {
 	for (int x=0; x<field.length; x++) {
-	    Point p = getLocation(field[x].getPoint());
-	    field[x].draw(g, p.x, p.y, m_fieldWidth, m_fieldHeight);
+            Point p = getLocation_new(field[x].getPoint());
+	    field[x].draw(g, p.x, p.y, (int)m_fieldSize, (int)m_fieldSize);
 	}
     }
 
@@ -497,8 +523,8 @@ public abstract class BoardDrawerBase
             Graphics2D g2d = (Graphics2D)g;
             g2d.setColor(Color.BLUE);
             for (int i=0; i<arrows.size(); i++) {
-                Point fm = getLocation(arrows.get(i).first);
-                Point to = getLocation(arrows.get(i).second);
+                Point fm = getLocation_new(arrows.get(i).first);
+                Point to = getLocation_new(arrows.get(i).second);
                 drawArrow(g2d, fm.x, fm.y, to.x, to.y, 1.5);
             }
         }
@@ -562,12 +588,13 @@ public abstract class BoardDrawerBase
     protected double m_dfileX, m_dfileY;      // Vector from a1 to b1.
     protected double m_drankX, m_drankY;      // Vector from a1 to a2.
 
-    protected int m_fieldRadius;   // for stone size, label size etc.
-
+    protected double m_fieldSize; // for stone size, label size etc.
+    
     // Old
     protected int m_marginX, m_marginY;
     protected int m_fieldWidth, m_fieldHeight, m_step;
     protected int m_bwidth, m_bheight; // the width (files) and height (ranks) of the board
+    protected int m_fieldRadius;   // for stone size, label size etc.
    
     // Cell outlines.
     protected Polygon m_outline[];
