@@ -1362,7 +1362,7 @@ public final class HexGui
         {
 	    HexPoint point = HexPoint.get(pairs.get(i).first);
             String value = pairs.get(i).second;
-            float v = new Float(value).floatValue();
+            float v = Float.parseFloat(value);
             m_guiboard.setAlphaColor(point, new Color(0, v, 1-v), 0.7f);
 	}
         if (hasText)

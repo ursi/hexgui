@@ -73,9 +73,9 @@ public final class GuiBoard
 		GuiField f = m_drawer.getFieldContaining(e.getPoint(), m_field);
 		if (f == null) return;
 
-                int modifiers = e.getModifiers();
-                boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) != 0;
-                boolean shift = (modifiers & ActionEvent.SHIFT_MASK) != 0;
+                int modifiers = e.getModifiersEx();
+                boolean ctrl = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
+                boolean shift = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
                 if (e.getClickCount() >= 2)
                     m_listener.fieldDoubleClicked(f.getPoint(), ctrl, shift);
                 else
