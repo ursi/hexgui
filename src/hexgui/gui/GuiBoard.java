@@ -125,37 +125,19 @@ public final class GuiBoard
     }
     
     /** Sets the type of board drawer to use.  If <code>name</code> is
-	not one of the known values, "Diamond" is used.
-	@param name one of ("Diamond", "Flat", "Flat2", "Go"). 
+	not one of the known values, "Hex" is used.
+	@param name one of ("Hex", "Go", "Y"). 
     */
     public void setDrawType(String name)
     {
-        if (name.equals("Y")) {
-            m_drawer = new BoardDrawerY();
-            initSize(YBOARD, m_width, m_height);
-        } else if (name.equals("Go")) {
+        if (name.equals("Hex")) {
             if (m_mode != HEXBOARD)
                 initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerGo();
-	    m_preferences.put("gui-board-type", "Go");
-	} else if (name.equals("Diamond")) {
-            if (m_mode != HEXBOARD)
-                initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerDiamond();
-	    m_preferences.put("gui-board-type", "Diamond");
-	} else if (name.equals("Flat")) {
-            if (m_mode != HEXBOARD)
-                initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerFlat();
-	    m_preferences.put("gui-board-type", "Flat");
-	} else if (name.equals("Flat2")) {
-            if (m_mode != HEXBOARD)
-                initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerFlat2();
-	    m_preferences.put("gui-board-type", "Flat2");
+	    m_drawer = new BoardDrawerHex();
+	    m_preferences.put("gui-board-type", "Hex");
 	} else {
 	    System.out.println("GuiBoard: unknown draw type '" + name + "'.");
-	    m_drawer = new BoardDrawerDiamond();
+	    m_drawer = new BoardDrawerHex();
 	} 
         repaint();
     }

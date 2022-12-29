@@ -507,26 +507,10 @@ public final class GuiMenuBar
 	String defaultType = m_preferences.get("gui-board-type");
 
 	JRadioButtonMenuItem item;
-	item = new JRadioButtonMenuItem("Diamond");
+	item = new JRadioButtonMenuItem("Hex");
 	item.addActionListener(m_listener);
 	item.setActionCommand("gui_board_draw_type");
-	if (defaultType.equals("Diamond"))
-	    item.setSelected(true);
-	m_btGroup.add(item);
-	menu.add(item);
-
-	item = new JRadioButtonMenuItem("Flat");
-	item.addActionListener(m_listener);
-	item.setActionCommand("gui_board_draw_type");
-	if (defaultType.equals("Flat"))
-	    item.setSelected(true);
-	m_btGroup.add(item);
-	menu.add(item);
-
-	item = new JRadioButtonMenuItem("Flat2");
-	item.addActionListener(m_listener);
-	item.setActionCommand("gui_board_draw_type");
-	if (defaultType.equals("Flat2"))
+	if (defaultType.equals("Hex"))
 	    item.setSelected(true);
 	m_btGroup.add(item);
 	menu.add(item);
@@ -627,7 +611,7 @@ public final class GuiMenuBar
     private JMenuItem m_pass, m_resign, m_forfeit, m_swap_pieces, m_swap_sides, m_addsetup, m_genmove;
 
     private ButtonGroup m_bsGroup;    // board sizes
-    private ButtonGroup m_btGroup;    // board view types (diamond, flat, etc)
+    private ButtonGroup m_btGroup;    // board view types (Hex, Go, Y, etc)
     private ButtonGroup m_orGroup;    // orientation: positive or negative?
     private ButtonGroup m_colorGroup; // whose turn to move?
 }

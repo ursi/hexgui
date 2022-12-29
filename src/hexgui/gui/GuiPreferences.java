@@ -15,7 +15,7 @@ public final class GuiPreferences
 {
     private static String[][] s_preflist = new String[][]
 	{ 
-	    {"gui-board-type",                    "Flat"},
+	    {"gui-board-type",                    "Hex"},
 	    {"gui-board-orientation",             "positive"},
 	    {"gui-board-pixel-width",             "750"},
 	    {"gui-board-pixel-height",            "500"},

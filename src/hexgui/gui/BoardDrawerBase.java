@@ -49,7 +49,6 @@ public abstract class BoardDrawerBase
     public BoardDrawerBase()
     {
 	m_background = null;
-	m_aspect_ratio = 1.0;
     }
 
     /** Loads the image in <code>filename</code> and sets it as the
@@ -86,8 +85,8 @@ public abstract class BoardDrawerBase
 
         m_width = w;
         m_height = h;
-        m_bwidth_new = bw;
-        m_bheight_new = bh;
+        m_bwidth = bw;
+        m_bheight = bh;
         m_rotation = rotation;
         m_mirrored = mirrored;
 
@@ -187,19 +186,15 @@ public abstract class BoardDrawerBase
 	m_width = w;
 	m_height = h;
 
-	m_bwidth = bw;
-	m_bheight = bh;
-
         setGeometry(w, h, bw, bh, 9.8, mirrored);
         
-	computeFieldPlacement();
-	m_outline = calcCellOutlines_new(field);
+	m_outline = calcCellOutlines(field);
 
 	setAntiAliasing(g);
 	drawBackground(g);
         drawEdges(g);
 	drawCells(g, field);
-	drawLabels_new(g);
+	drawLabels(g);
 	drawShadows(g, field);
 	drawFields(g, field);
         drawAlpha(g, field);
@@ -209,46 +204,10 @@ public abstract class BoardDrawerBase
 
     //------------------------------------------------------------
 
-    protected abstract Point getLocation(HexPoint p);
-
-    /** Calculates the width of a field given the dimensions of the
-	window and board.
-	@param w width of window
-	@param h height of window
-	@param bw width of board
-	@param bh height of board
-    */
-    protected abstract int calcFieldWidth(int w, int h, int bw, int bh);
-
-    /** Calculates the height of a field given the dimensions of the
-	window and board.
-	@see calcFieldWidth
-    */
-    protected abstract int calcFieldHeight(int w, int h, int bw, int bh);
-
-    
-    protected abstract int calcStepSize();
-
-    /** Calculates the width of the board in pixels. 
-	@requires calcFieldWidth and calcFieldHeight to have been called.
-    */
-    protected abstract int calcBoardWidth();
-    
-    /** Calculates the height of the board in pixels.
-	@requires calcFieldWidth and calcFieldHeight to have been called.
-    */
-    protected abstract int calcBoardHeight();
-
-    /** Performs any necessary initializations for drawing the
-	outlines of the fields.
-	@param the fields it will need to draw
-    */
-    protected abstract Polygon[] calcCellOutlines(GuiField field[]);
-
     /** Calculate an array of hexagons representing the board's cells.
 	@param the fields it will need to draw
      */
-    protected Polygon[] calcCellOutlines_new(GuiField field[])
+    protected Polygon[] calcCellOutlines(GuiField field[])
     {
 	Polygon outline[] = new Polygon[field.length];
         for (int x = 0; x < outline.length; x++) {
@@ -311,7 +270,7 @@ public abstract class BoardDrawerBase
         p.addPoint((int)point.x, (int)point.y);
     }
 
-    protected Point getLocation_new(HexPoint p)
+    protected Point getLocation(HexPoint p)
     {
         Point2D.Double pp = hexPoint(p.x, p.y, 0, 0, 0, 0, 0);
         return new Point((int)pp.x, (int)pp.y);
@@ -335,52 +294,52 @@ public abstract class BoardDrawerBase
         for (int theta = 90; theta <= 150; theta += 10) {
             addHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
         }
-        for (int a=0; a<m_bwidth_new; a++) {
+        for (int a=0; a<m_bwidth; a++) {
             addHexPoint(e1, a, 0, 0, -1, 0, 0, 0);
             addHexPoint(e1, a, 0, 0, 0, -1, 0, 0);
         }
-        addHexPoint(e1, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
+        addHexPoint(e1, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
         for (int theta = 60; theta <= 90; theta += 10) {
-            addHexPoint(e1, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e1, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
         }
             
         Polygon e2 = new Polygon();
         for (int theta = 210; theta >= 150; theta -= 10) {
             addHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
         }
-        for (int b=0; b<m_bheight_new; b++) {
+        for (int b=0; b<m_bheight; b++) {
             addHexPoint(e2, 0, b, 0, -1, 0, 0, 0);
             addHexPoint(e2, 0, b, -1, 0, 0, 0, 0);
         }
-        addHexPoint(e2, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
+        addHexPoint(e2, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
         for (int theta = 240; theta >= 210; theta -= 10) {
-            addHexPoint(e2, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e2, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
         }
             
         Polygon e3 = new Polygon();
         for (int theta = -90; theta <= -30; theta += 10) {
-            addHexPoint(e3, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
+            addHexPoint(e3, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
         }
-        for (int a=m_bwidth_new-1; a >= 0; a--) {
-            addHexPoint(e3, a, m_bheight_new-1, 0, 1, 0, 0, 0);
-            addHexPoint(e3, a, m_bheight_new-1, 0, 0, 1, 0, 0);
+        for (int a=m_bwidth-1; a >= 0; a--) {
+            addHexPoint(e3, a, m_bheight-1, 0, 1, 0, 0, 0);
+            addHexPoint(e3, a, m_bheight-1, 0, 0, 1, 0, 0);
         }
-        addHexPoint(e3, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
+        addHexPoint(e3, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
         for (int theta = -120; theta <= -90; theta += 10) {
-            addHexPoint(e3, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e3, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
         }
             
         Polygon e4 = new Polygon();
         for (int theta = 30; theta >= -30; theta -= 10) {
-            addHexPoint(e4, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
+            addHexPoint(e4, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
         }
-        for (int b=m_bheight_new-1; b >= 0; b--) {
-            addHexPoint(e4, m_bwidth_new-1, b, 0, 1, 0, 0, 0);
-            addHexPoint(e4, m_bwidth_new-1, b, 1, 0, 0, 0, 0);
+        for (int b=m_bheight-1; b >= 0; b--) {
+            addHexPoint(e4, m_bwidth-1, b, 0, 1, 0, 0, 0);
+            addHexPoint(e4, m_bwidth-1, b, 1, 0, 0, 0, 0);
         }
-        addHexPoint(e4, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
+        addHexPoint(e4, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
         for (int theta = 60; theta >= 30; theta -= 10) {
-            addHexPoint(e4, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+            addHexPoint(e4, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
         }
 
 	g.setColor(Color.black);
@@ -398,43 +357,11 @@ public abstract class BoardDrawerBase
         g.drawPolygon(e4);
     }
 
-    protected void computeFieldPlacement()
-    {
-	m_fieldWidth = calcFieldWidth(m_width, m_height, m_bwidth, m_bheight);
-	m_fieldHeight = calcFieldHeight(m_width, m_height, m_bwidth, m_bheight);
-
-	if (m_fieldHeight >= (int)(m_fieldWidth/m_aspect_ratio)) {
-	    m_fieldHeight = (int)(m_fieldWidth/m_aspect_ratio);
-	} else {
-	    m_fieldWidth = (int)(m_fieldHeight*m_aspect_ratio);
-	}
-
-	// If field dimensions are not even then the inner cell lines
-	// on the board can be doubled up.  
-	// FIXME: lines still get doubled up...why?
-	if ((m_fieldWidth & 1) != 0) m_fieldWidth--;
-	if ((m_fieldHeight & 1) != 0) m_fieldHeight--;
-
-	m_fieldRadius = (m_fieldWidth < m_fieldHeight) ? 
-                         m_fieldWidth : m_fieldHeight;
-
-	m_step = calcStepSize();
-
-	int bw = calcBoardWidth();
-	int bh = calcBoardHeight();
-
-        // add a half cell's worth of empty space
-        int extra = (m_width - (bw + 3*m_fieldWidth));
-        m_marginX = extra/2 + 3*m_fieldWidth/2;
-
-	m_marginY = (m_height - bh)/2 + m_fieldHeight/2;
-    }
-
     //------------------------------------------------------------
 
     protected int getShadowOffset()
     {
-        return (m_fieldRadius - 2*GuiField.getStoneMargin(m_fieldRadius)) / 12;
+        return (int)((m_fieldSize - 2*GuiField.getStoneMargin((int)m_fieldSize)) / 12);
     }
 
     protected void drawBackground(Graphics g)
@@ -460,9 +387,7 @@ public abstract class BoardDrawerBase
         g.setFont(f);
     }
 
-    protected abstract void drawLabels(Graphics g, boolean alphatop);
-
-    protected void drawLabels_new(Graphics g)
+    protected void drawLabels(Graphics g)
     {
         String string;
         Point2D.Double p;
@@ -487,7 +412,7 @@ public abstract class BoardDrawerBase
     
     protected void drawShadows(Graphics graphics, GuiField[] field)
     {
-        if (m_fieldRadius <= 5)
+        if (m_fieldSize <= 10)
             return;
         Graphics2D graphics2D =
             graphics instanceof Graphics2D ? (Graphics2D)graphics : null;
@@ -506,7 +431,7 @@ public abstract class BoardDrawerBase
         for (int pos = 0; pos < field.length; pos++) {
 	    if (field[pos].getColor() == HexColor.EMPTY)
 		continue;
-	    Point location = getLocation_new(field[pos].getPoint());
+	    Point location = getLocation(field[pos].getPoint());
 	    graphics.setColor(Color.black);
 	    graphics.fillOval(location.x - size + offset,
 			      location.y - size + offset,
@@ -518,7 +443,7 @@ public abstract class BoardDrawerBase
     protected void drawFields(Graphics g, GuiField field[])
     {
 	for (int x=0; x<field.length; x++) {
-            Point p = getLocation_new(field[x].getPoint());
+            Point p = getLocation(field[x].getPoint());
 	    field[x].draw(g, p.x, p.y, (int)m_fieldSize, (int)m_fieldSize);
 	}
     }
@@ -553,8 +478,8 @@ public abstract class BoardDrawerBase
             Graphics2D g2d = (Graphics2D)g;
             g2d.setColor(Color.BLUE);
             for (int i=0; i<arrows.size(); i++) {
-                Point fm = getLocation_new(arrows.get(i).first);
-                Point to = getLocation_new(arrows.get(i).second);
+                Point fm = getLocation(arrows.get(i).first);
+                Point to = getLocation(arrows.get(i).second);
                 drawArrow(g2d, fm.x, fm.y, to.x, to.y, 1.5);
             }
         }
@@ -579,7 +504,7 @@ public abstract class BoardDrawerBase
 
         Polygon tmpPoly=new Polygon();
         int i1=12+(int)(stroke*2);
-        // make the arrow head the same size regardless of the length length
+        // make the arrow head the same size regardless of the length
         int i2=6+(int)stroke;		
         tmpPoly.addPoint(x2,y2); // arrow tip
         tmpPoly.addPoint(x2+xCor(i1,aDir+.5),y2+yCor(i1,aDir+.5));
@@ -593,12 +518,10 @@ public abstract class BoardDrawerBase
     private static int yCor(int len, double dir) {return (int)(len * Math.cos(dir));}
     private static int xCor(int len, double dir) {return (int)(len * Math.sin(dir));}
 
-    protected double m_aspect_ratio;
-
     protected Image m_background;
 
     protected int m_width, m_height; // the width and height of the canvas
-    protected int m_bwidth_new, m_bheight_new; // the width (files) and height (ranks) of the board
+    protected int m_bwidth, m_bheight; // the width (files) and height (ranks) of the board
 
     protected double m_rotation; // clock direction of the a1 cell:
                                  // 9=left (diamond orientation),
@@ -619,12 +542,6 @@ public abstract class BoardDrawerBase
 
     protected double m_fieldSize; // for stone size, label size etc.
     
-    // Old
-    protected int m_marginX, m_marginY;
-    protected int m_fieldWidth, m_fieldHeight, m_step;
-    protected int m_bwidth, m_bheight; // the width (files) and height (ranks) of the board
-    protected int m_fieldRadius;   // for stone size, label size etc.
-   
     // Cell outlines.
     protected Polygon m_outline[];
 
