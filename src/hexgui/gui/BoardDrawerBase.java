@@ -13,6 +13,7 @@ import java.util.Vector;
 import javax.swing.*;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Path2D;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Color;
@@ -22,6 +23,7 @@ import java.awt.Image;
 import java.awt.FontMetrics;
 import java.awt.Font;
 import java.awt.RenderingHints;
+import java.awt.BasicStroke;
 
 import java.awt.event.*;
 import java.net.URL;
@@ -81,6 +83,7 @@ public abstract class BoardDrawerBase
         m_borderradius = 1.2;
         m_margin = 0.6;
         m_labelradius = 1.1;
+        m_strokewidth = 0.03;
 
         m_width = w;
         m_height = h;
@@ -154,10 +157,10 @@ public abstract class BoardDrawerBase
     */
     public GuiField getFieldContaining(Point p, GuiField field[])
     {
-	if (m_outline == null)
+	if (m_outlines == null)
 	    return null;
 	for (int x=0; x<field.length; x++) {
-	    if (m_outline[x].contains(p)) 
+	    if (m_outlines[x].contains(p)) 
 		return field[x];
 	}
 	return null;
@@ -183,9 +186,9 @@ public abstract class BoardDrawerBase
 		     GuiField field[],
                      Vector<Pair<HexPoint, HexPoint>> arrows)
     {
-        setGeometry(w, h, bw, bh, rotation, mirrored);
+        setGeometry(w, h, bw, bh, rotation-0.1, mirrored); // ###
         
-	m_outline = calcCellOutlines(field);
+	m_outlines = calcCellOutlines(field);
 
 	setAntiAliasing(g);
 	drawBackground(g);
@@ -203,18 +206,26 @@ public abstract class BoardDrawerBase
     /** Calculate an array of hexagons representing the board's cells.
 	@param the fields it will need to draw
      */
-    protected Polygon[] calcCellOutlines(GuiField field[])
+    protected Path2D[] calcCellOutlines(GuiField field[])
     {
-	Polygon outline[] = new Polygon[field.length];
+	Path2D outline[] = new Path2D[field.length];
         for (int x = 0; x < outline.length; x++) {
             HexPoint c = field[x].getPoint();
-            outline[x] = new Polygon();
-            addHexPoint(outline[x], c.x, c.y, 1, 0, 0, 0, 0);
-            addHexPoint(outline[x], c.x, c.y, 0, 1, 0, 0, 0);
-            addHexPoint(outline[x], c.x, c.y, 0, 0, 1, 0, 0);
-            addHexPoint(outline[x], c.x, c.y, -1, 0, 0, 0, 0);
-            addHexPoint(outline[x], c.x, c.y, 0, -1, 0, 0, 0);
-            addHexPoint(outline[x], c.x, c.y, 0, 0, -1, 0, 0);
+            Point2D.Double p;
+            outline[x] = new Path2D.Double();
+            p = hexPoint(c.x, c.y, 1, 0, 0, 0, 0);
+            outline[x].moveTo(p.x, p.y);
+            p = hexPoint(c.x, c.y, 0, 1, 0, 0, 0);
+            outline[x].lineTo(p.x, p.y);
+            p = hexPoint(c.x, c.y, 0, 0, 1, 0, 0);
+            outline[x].lineTo(p.x, p.y);
+            p = hexPoint(c.x, c.y, -1, 0, 0, 0, 0);
+            outline[x].lineTo(p.x, p.y);
+            p = hexPoint(c.x, c.y, 0, -1, 0, 0, 0);
+            outline[x].lineTo(p.x, p.y);
+            p = hexPoint(c.x, c.y, 0, 0, -1, 0, 0);
+            outline[x].lineTo(p.x, p.y);
+            outline[x].closePath();
         }	
 	return outline;
     }
@@ -225,17 +236,19 @@ public abstract class BoardDrawerBase
     */
     protected void drawCells(Graphics2D g, GuiField field[])
     {
+        g.setStroke(new BasicStroke((float)(m_strokewidth * m_fieldSize)));
+
 	g.setColor(Color.black);
-	for (int i=0; i<m_outline.length; i++) {
+	for (int i=0; i<m_outlines.length; i++) {
 	    if ((field[i].getAttributes() & GuiField.DRAW_CELL_OUTLINE) != 0) {
-		g.drawPolygon(m_outline[i]);
+		g.draw(m_outlines[i]);
 	    }
 	}
 
 	g.setColor(Color.yellow);
-	for (int i=0; i<m_outline.length; i++) {
+	for (int i=0; i<m_outlines.length; i++) {
 	    if ((field[i].getAttributes() & GuiField.SELECTED) != 0) {
-		g.drawPolygon(m_outline[i]);
+		g.draw(m_outlines[i]);
 	    }
 	}
     }
@@ -346,6 +359,7 @@ public abstract class BoardDrawerBase
         g.fillPolygon(e2);
         g.fillPolygon(e4);
 
+        g.setStroke(new BasicStroke((float)(m_strokewidth * m_fieldSize)));
         g.setColor(Color.black);
         g.drawPolygon(e1);
         g.drawPolygon(e2);
@@ -443,7 +457,7 @@ public abstract class BoardDrawerBase
 
     protected void drawAlpha(Graphics2D g, GuiField field[])
     {
-        for (int i=0; i<m_outline.length; i++) {
+        for (int i=0; i<m_outlines.length; i++) {
             if ((field[i].getAttributes() & GuiField.DRAW_ALPHA) == 0)
                 continue;
             
@@ -456,7 +470,7 @@ public abstract class BoardDrawerBase
                                          field[i].getAlphaBlend()));
             
             g.setColor(color);
-            g.fillPolygon(m_outline[i]);
+            g.fill(m_outlines[i]);
 	}
     }
 
@@ -517,16 +531,17 @@ public abstract class BoardDrawerBase
     protected double m_borderradius;
     protected double m_margin;
     protected double m_labelradius;
+    protected double m_strokewidth; 
     
     // Computed geometry of the board.
     protected double m_originX, m_originY;  // Location of the a1 cell.
     protected double m_dfileX, m_dfileY;      // Vector from a1 to b1.
     protected double m_drankX, m_drankY;      // Vector from a1 to a2.
 
-    protected double m_fieldSize; // for stone size, label size etc.
+    protected double m_fieldSize;   // for stone size, label size etc.
     
     // Cell outlines.
-    protected Polygon m_outline[];
+    protected Path2D m_outlines[];
 
     protected static final AlphaComposite COMPOSITE_3
         = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f);
