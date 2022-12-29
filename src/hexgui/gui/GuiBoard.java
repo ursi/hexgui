@@ -204,32 +204,22 @@ public final class GuiBoard
 
         if (m_mode == HEXBOARD) 
         {
-            m_field = new GuiField[w*h+4];
+            m_field = new GuiField[w*h];
             for (int x=0; x<w*h; x++) {
                 m_field[x] = new GuiField(HexPoint.get(x % w, x / w));
                 m_field[x].setAttributes(GuiField.DRAW_CELL_OUTLINE);
             }
-            m_field[w*h+0] = new GuiField(HexPoint.NORTH);
-            m_field[w*h+1] = new GuiField(HexPoint.SOUTH);
-            m_field[w*h+2] = new GuiField(HexPoint.WEST);
-            m_field[w*h+3] = new GuiField(HexPoint.EAST);
         } 
         else 
         {
             int n = w*(w+1)/2;
-            m_field = new GuiField[n+3];
+            m_field = new GuiField[n];
             for (int y=0,i=0; y<w; y++) {
                 for (int x=0; x<=y; x++,i++) {
                     m_field[i] = new GuiField(HexPoint.get(x, y));
                     m_field[i].setAttributes(GuiField.DRAW_CELL_OUTLINE);
                 }
             }
-            m_field[n+0] = new GuiField(HexPoint.SOUTH);
-            m_field[n+0].setAttributes(GuiField.DRAW_CELL_OUTLINE);
-            m_field[n+1] = new GuiField(HexPoint.WEST);
-            m_field[n+1].setAttributes(GuiField.DRAW_CELL_OUTLINE);
-            m_field[n+2] = new GuiField(HexPoint.EAST);
-            m_field[n+2].setAttributes(GuiField.DRAW_CELL_OUTLINE);
         }
 	clearAll();
         repaint();
@@ -266,20 +256,8 @@ public final class GuiBoard
     /** Clears all marks and stones from the board. */
     public void clearAll()
     {
-	for (int x=0; x<m_field.length; x++)
+	for (int x=0; x<m_field.length; x++) {
 	    m_field[x].clear();
-        if (m_mode == HEXBOARD) 
-        {
-            getField(HexPoint.NORTH).setColor(HexColor.BLACK);
-            getField(HexPoint.SOUTH).setColor(HexColor.BLACK);
-            getField(HexPoint.WEST).setColor(HexColor.WHITE);
-            getField(HexPoint.EAST).setColor(HexColor.WHITE);
-        } 
-        else 
-        {
-            getField(HexPoint.SOUTH).setColor(HexColor.EMPTY);
-            getField(HexPoint.WEST).setColor(HexColor.EMPTY);
-            getField(HexPoint.EAST).setColor(HexColor.EMPTY);
         }
         repaint();
     }
@@ -489,10 +467,6 @@ public final class GuiBoard
         int count = 0;
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             if (m_field[x].getColor() != HexColor.EMPTY) {
                 count++;
             }
@@ -507,10 +481,6 @@ public final class GuiBoard
     {
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             HexColor color = m_field[x].getColor();
             m_field[x].setColor(color.otherColor());
         }
@@ -527,18 +497,10 @@ public final class GuiBoard
         Map<HexPoint, HexColor> colors = new TreeMap<HexPoint, HexColor>();
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             colors.put(point, m_field[x].getColor());
         }
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             HexPoint otherpoint = point.reflect();
             m_field[x].setColor(colors.get(otherpoint).otherColor());
         }
@@ -550,10 +512,6 @@ public final class GuiBoard
     {
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST)
-                continue;
-                
             HexColor color = m_field[x].getColor();
             if (color == HexColor.EMPTY)
                 continue;
@@ -668,17 +626,7 @@ public final class GuiBoard
 	for (int i=0; i<field.length; i++) {
 	    HexPoint p = field[i].getPoint();
 	    out[i] = new GuiField(field[i]);
-	    if (p == HexPoint.NORTH)
-		out[i].setPoint(HexPoint.WEST);
-	    else if (p == HexPoint.WEST)
-		out[i].setPoint(HexPoint.NORTH);
-	    else if (p == HexPoint.EAST)
-		out[i].setPoint(HexPoint.SOUTH);
-	    else if (p == HexPoint.SOUTH)
-		out[i].setPoint(HexPoint.EAST);
-	    else {
-		out[i].setPoint(HexPoint.get(p.y, p.x));
-	    }	    
+            out[i].setPoint(HexPoint.get(p.y, p.x));
 	}
 	return out;
     }

@@ -330,7 +330,6 @@ public abstract class BoardDrawerBase
     */
     protected void drawEdges(Graphics g)
     {
-	g.setColor(Color.black);
         // 1-edge.
 
         double r0 = m_borderradius - m_excentricity_acute/2;
@@ -389,9 +388,16 @@ public abstract class BoardDrawerBase
         for (int theta = 60; theta >= 30; theta -= 10) {
             addHexPoint(e4, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
         }
-            
+
+	g.setColor(Color.black);
         g.fillPolygon(e1);
         g.fillPolygon(e3);
+        
+	g.setColor(Color.white);
+        g.fillPolygon(e2);
+        g.fillPolygon(e4);
+
+        g.setColor(Color.black);
         g.drawPolygon(e1);
         g.drawPolygon(e2);
         g.drawPolygon(e3);
@@ -471,16 +477,23 @@ public abstract class BoardDrawerBase
         if (graphics2D == null)
             return;
         graphics2D.setComposite(COMPOSITE_3);
-        int size = m_fieldRadius - 2 * GuiField.getStoneMargin(m_fieldRadius);
+
+        // The following calculation is byzantine and should all be converted to double.
+        // For now, we echo how the stone radius is determined in GuiField.
+        int w = (int)m_fieldSize;
+        int rad = w/2;
+        int mar = GuiField.getStoneMargin(rad*2);
+        int size = rad - mar;
+
         int offset = getShadowOffset();
         for (int pos = 0; pos < field.length; pos++) {
 	    if (field[pos].getColor() == HexColor.EMPTY)
 		continue;
 	    Point location = getLocation_new(field[pos].getPoint());
 	    graphics.setColor(Color.black);
-	    graphics.fillOval(location.x - size / 2 + offset,
-			      location.y - size / 2 + offset,
-			      size, size);
+	    graphics.fillOval(location.x - size + offset,
+			      location.y - size + offset,
+			      size*2, size*2);
 	}
         graphics.setPaintMode();
     }
