@@ -213,18 +213,12 @@ public abstract class BoardDrawerBase
             HexPoint c = field[x].getPoint();
             Point2D.Double p;
             outline[x] = new Path2D.Double();
-            p = hexPoint(c.x, c.y, 1, 0, 0, 0, 0);
-            outline[x].moveTo(p.x, p.y);
-            p = hexPoint(c.x, c.y, 0, 1, 0, 0, 0);
-            outline[x].lineTo(p.x, p.y);
-            p = hexPoint(c.x, c.y, 0, 0, 1, 0, 0);
-            outline[x].lineTo(p.x, p.y);
-            p = hexPoint(c.x, c.y, -1, 0, 0, 0, 0);
-            outline[x].lineTo(p.x, p.y);
-            p = hexPoint(c.x, c.y, 0, -1, 0, 0, 0);
-            outline[x].lineTo(p.x, p.y);
-            p = hexPoint(c.x, c.y, 0, 0, -1, 0, 0);
-            outline[x].lineTo(p.x, p.y);
+            moveToHexPoint(outline[x], c.x, c.y, 1, 0, 0, 0, 0);
+            lineToHexPoint(outline[x], c.x, c.y, 0, 1, 0, 0, 0);
+            lineToHexPoint(outline[x], c.x, c.y, 0, 0, 1, 0, 0);
+            lineToHexPoint(outline[x], c.x, c.y, -1, 0, 0, 0, 0);
+            lineToHexPoint(outline[x], c.x, c.y, 0, -1, 0, 0, 0);
+            lineToHexPoint(outline[x], c.x, c.y, 0, 0, -1, 0, 0);
             outline[x].closePath();
         }	
 	return outline;
@@ -279,13 +273,30 @@ public abstract class BoardDrawerBase
         p.addPoint((int)point.x, (int)point.y);
     }
 
+    /** An auxiliary function for adding a point to a path, using
+     Hex coordinates. Here a is the file, b is the rank, c, d, e
+     are offsets, and r, theta is a polar coordinate. */
+    protected void moveToHexPoint(Path2D p, double a, double b, double c, double d, double e, double r, double theta)
+    {
+        Point2D.Double point = hexPoint(a, b, c, d, e, r, theta);
+        p.moveTo(point.x, point.y);
+    }
+
+    /** An auxiliary function for adding a point to a path, using
+     Hex coordinates. Here a is the file, b is the rank, c, d, e
+     are offsets, and r, theta is a polar coordinate. */
+    protected void lineToHexPoint(Path2D p, double a, double b, double c, double d, double e, double r, double theta)
+    {
+        Point2D.Double point = hexPoint(a, b, c, d, e, r, theta);
+        p.lineTo(point.x, point.y);
+    }
+
     protected Point getLocation(HexPoint p)
     {
         Point2D.Double pp = hexPoint(p.x, p.y, 0, 0, 0, 0, 0);
         return new Point((int)pp.x, (int)pp.y);
     }
 
-    
     /** Draws the board, according to the current geometry, which must
         have been set with setGeometry.
         @param g graphics context to draw to.
@@ -297,74 +308,80 @@ public abstract class BoardDrawerBase
         double r0 = m_borderradius - m_excentricity_acute/2;
         double r1 = m_borderradius - m_excentricity_obtuse/2;
         
-        Polygon e1 = new Polygon();
-        // While the Graphics class can draw arc segments, it can't join them with other segments.
-        // So we approximate the arc by a polygon.
+        Path2D e1 = new Path2D.Double();
+        moveToHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, 90);
         for (int theta = 90; theta <= 150; theta += 10) {
-            addHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
+            lineToHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
         }
         for (int a=0; a<m_bwidth; a++) {
-            addHexPoint(e1, a, 0, 0, -1, 0, 0, 0);
-            addHexPoint(e1, a, 0, 0, 0, -1, 0, 0);
+            lineToHexPoint(e1, a, 0, 0, -1, 0, 0, 0);
+            lineToHexPoint(e1, a, 0, 0, 0, -1, 0, 0);
         }
-        addHexPoint(e1, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
+        lineToHexPoint(e1, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
         for (int theta = 60; theta <= 90; theta += 10) {
-            addHexPoint(e1, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+            lineToHexPoint(e1, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
         }
+        e1.closePath();
             
-        Polygon e2 = new Polygon();
+        Path2D e2 = new Path2D.Double();
+        moveToHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, 210);
         for (int theta = 210; theta >= 150; theta -= 10) {
-            addHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
+            lineToHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
         }
         for (int b=0; b<m_bheight; b++) {
-            addHexPoint(e2, 0, b, 0, -1, 0, 0, 0);
-            addHexPoint(e2, 0, b, -1, 0, 0, 0, 0);
+            lineToHexPoint(e2, 0, b, 0, -1, 0, 0, 0);
+            lineToHexPoint(e2, 0, b, -1, 0, 0, 0, 0);
         }
-        addHexPoint(e2, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
+        lineToHexPoint(e2, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
         for (int theta = 240; theta >= 210; theta -= 10) {
-            addHexPoint(e2, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+            lineToHexPoint(e2, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
         }
+        e2.closePath();
             
-        Polygon e3 = new Polygon();
+        Path2D e3 = new Path2D.Double();
+        moveToHexPoint(e3, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, -90);
         for (int theta = -90; theta <= -30; theta += 10) {
-            addHexPoint(e3, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
+            lineToHexPoint(e3, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
         }
         for (int a=m_bwidth-1; a >= 0; a--) {
-            addHexPoint(e3, a, m_bheight-1, 0, 1, 0, 0, 0);
-            addHexPoint(e3, a, m_bheight-1, 0, 0, 1, 0, 0);
+            lineToHexPoint(e3, a, m_bheight-1, 0, 1, 0, 0, 0);
+            lineToHexPoint(e3, a, m_bheight-1, 0, 0, 1, 0, 0);
         }
-        addHexPoint(e3, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
+        lineToHexPoint(e3, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
         for (int theta = -120; theta <= -90; theta += 10) {
-            addHexPoint(e3, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+            lineToHexPoint(e3, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
         }
+        e3.closePath();
             
-        Polygon e4 = new Polygon();
+        Path2D e4 = new Path2D.Double();
+        moveToHexPoint(e4, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, 30);
         for (int theta = 30; theta >= -30; theta -= 10) {
-            addHexPoint(e4, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
+            lineToHexPoint(e4, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
         }
         for (int b=m_bheight-1; b >= 0; b--) {
-            addHexPoint(e4, m_bwidth-1, b, 0, 1, 0, 0, 0);
-            addHexPoint(e4, m_bwidth-1, b, 1, 0, 0, 0, 0);
+            lineToHexPoint(e4, m_bwidth-1, b, 0, 1, 0, 0, 0);
+            lineToHexPoint(e4, m_bwidth-1, b, 1, 0, 0, 0, 0);
         }
-        addHexPoint(e4, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
+        lineToHexPoint(e4, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
         for (int theta = 60; theta >= 30; theta -= 10) {
-            addHexPoint(e4, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+            lineToHexPoint(e4, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
         }
+        e4.closePath();
 
 	g.setColor(Color.black);
-        g.fillPolygon(e1);
-        g.fillPolygon(e3);
+        g.fill(e1);
+        g.fill(e3);
         
 	g.setColor(Color.white);
-        g.fillPolygon(e2);
-        g.fillPolygon(e4);
+        g.fill(e2);
+        g.fill(e4);
 
         g.setStroke(new BasicStroke((float)(m_strokewidth * m_fieldSize)));
         g.setColor(Color.black);
-        g.drawPolygon(e1);
-        g.drawPolygon(e2);
-        g.drawPolygon(e3);
-        g.drawPolygon(e4);
+        g.draw(e1);
+        g.draw(e2);
+        g.draw(e3);
+        g.draw(e4);
     }
 
     //------------------------------------------------------------
