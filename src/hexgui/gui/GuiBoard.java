@@ -651,36 +651,15 @@ public final class GuiBoard
 	    int bw = m_width;
 	    int bh = m_height;
 	    GuiField ff[] = m_field;
-	    boolean alphaontop = true;
             Vector<Pair<HexPoint, HexPoint>> arrows = m_arrows;
 
-            boolean positive = true;
+            boolean mirrored = false;
             if (m_preferences.get("gui-board-orientation").equals("negative")) {
-                positive = false;
+                mirrored = true;
             }
-            boolean flip;
-            if (m_preferences.get("gui-board-type").equals("Flat2")) {
-                flip = positive;
-            } else {
-                flip = !positive;
-            }
-            
-	    if (flip) {
-		alphaontop = false;
-		ff = flipFields(m_field);
-
-                arrows = new Vector<Pair<HexPoint, HexPoint>>();
-                for (int i=0; i<m_arrows.size(); i++) {
-                    HexPoint p1 = m_arrows.get(i).first;
-                    HexPoint p2 = m_arrows.get(i).second;
-                    arrows.add(new Pair<HexPoint, HexPoint>
-                               (HexPoint.get(p1.y, p1.x),
-                                HexPoint.get(p2.y, p2.x)));
-                }
-	    }
 
 	    m_drawer.draw(m_image.getGraphics(), 
-                          w, h, bw, bh, alphaontop, 
+                          w, h, bw, bh, mirrored, 
                           ff, arrows);
 	    graphics.drawImage(m_image, 0, 0, null);
 	}

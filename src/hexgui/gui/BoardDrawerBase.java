@@ -81,7 +81,8 @@ public abstract class BoardDrawerBase
         m_excentricity_acute = 0.5;
         m_excentricity_obtuse = 0.5;
         m_borderradius = 1.2;
-        m_margin = 10;
+        m_margin = 0.5;
+        m_labelradius = 1;
 
         m_width = w;
         m_height = h;
@@ -130,8 +131,8 @@ public abstract class BoardDrawerBase
         double maxY = Math.max(Math.max(p0Y+r0, p1Y+r1), Math.max(p2Y+r0, p3Y+r1));
 
         // Scaling factor.
-        double scaleX = (w - 2*m_margin) / (maxX - minX);
-        double scaleY = (h - 2*m_margin) / (maxY - minY);
+        double scaleX = w / (maxX - minX + 2*m_margin);
+        double scaleY = h / (maxY - minY + 2*m_margin);
         double scale = Math.min(scaleX, scaleY);
 
         // Geometry.
@@ -173,13 +174,13 @@ public abstract class BoardDrawerBase
 	@param h the height of the region to draw in
 	@param bw the width of the board (in fields)
 	@param bh the height of the board (in fields)
-	@param alphaontop true if letters are on top, otherwise numbers
+	@param mirrored true if board is mirrored
         @param field the fields to draw
         @param arrows the list of arrows to draw
     */
     public void draw(Graphics g, 
 		     int w, int h, int bw, int bh, 
-		     boolean alphaontop,
+		     boolean mirrored,
 		     GuiField field[],
                      Vector<Pair<HexPoint, HexPoint>> arrows)
     {
@@ -189,14 +190,7 @@ public abstract class BoardDrawerBase
 	m_bwidth = bw;
 	m_bheight = bh;
 
-        m_alphaontop = alphaontop;
-
-        if (!m_alphaontop) {
-            m_bwidth = bh;
-            m_bheight = bw;
-        }
-        
-        setGeometry(w, h, bw, bh, 9.8, !m_alphaontop);
+        setGeometry(w, h, bw, bh, 9.8, mirrored);
         
 	computeFieldPlacement();
 	m_outline = calcCellOutlines_new(field);
@@ -205,7 +199,7 @@ public abstract class BoardDrawerBase
 	drawBackground(g);
         drawEdges(g);
 	drawCells(g, field);
-	drawLabels(g, alphaontop);
+	drawLabels_new(g);
 	drawShadows(g, field);
 	drawFields(g, field);
         drawAlpha(g, field);
@@ -468,6 +462,29 @@ public abstract class BoardDrawerBase
 
     protected abstract void drawLabels(Graphics g, boolean alphatop);
 
+    protected void drawLabels_new(Graphics g)
+    {
+        String string;
+        Point2D.Double p;
+        
+        g.setColor(Color.black);
+
+        for (int a=0; a<m_bwidth; a++) {
+            string = Character.toString((char)((int)'A' + a));
+            p = hexPoint(a, -m_labelradius, 0, 0, 0, 0, 0);
+            drawLabel(g, new Point((int)p.x, (int)p.y), string, 0);
+            p = hexPoint(a, m_bheight-1+m_labelradius, 0, 0, 0, 0, 0);
+            drawLabel(g, new Point((int)p.x, (int)p.y), string, 0);
+        }
+        for (int b=0; b<m_bheight; b++) {
+            string = Integer.toString(b+1);
+            p = hexPoint(-m_labelradius, b, 0, 0, 0, 0, 0);
+            drawLabel(g, new Point((int)p.x, (int)p.y), string, 0);
+            p = hexPoint(m_bwidth-1+m_labelradius, b, 0, 0, 0, 0, 0);
+            drawLabel(g, new Point((int)p.x, (int)p.y), string, 0);
+        }
+    }
+    
     protected void drawShadows(Graphics graphics, GuiField[] field)
     {
         if (m_fieldRadius <= 5)
@@ -576,8 +593,6 @@ public abstract class BoardDrawerBase
     private static int yCor(int len, double dir) {return (int)(len * Math.cos(dir));}
     private static int xCor(int len, double dir) {return (int)(len * Math.sin(dir));}
 
-    protected boolean m_alphaontop;
-
     protected double m_aspect_ratio;
 
     protected Image m_background;
@@ -595,6 +610,7 @@ public abstract class BoardDrawerBase
     protected double m_excentricity_obtuse;
     protected double m_borderradius;
     protected double m_margin;
+    protected double m_labelradius;
     
     // Computed geometry of the board.
     protected double m_originX, m_originY;  // Location of the a1 cell.
