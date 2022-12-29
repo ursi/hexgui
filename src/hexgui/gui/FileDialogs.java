@@ -86,7 +86,7 @@ public final class FileDialogs
             Use this type, if a file name should be selected, but it is not
             known what the file name is used for and if the file already
             exists.
-            @deprecated Not supported by native AWT FileDialog */
+            @Deprecated Not supported by native AWT FileDialog */
         FILE_SELECT
     }
 
