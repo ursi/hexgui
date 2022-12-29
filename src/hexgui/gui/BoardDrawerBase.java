@@ -178,15 +178,13 @@ public abstract class BoardDrawerBase
         @param arrows the list of arrows to draw
     */
     public void draw(Graphics g, 
-		     int w, int h, int bw, int bh, 
+		     int w, int h, int bw, int bh,
+                     double rotation,
 		     boolean mirrored,
 		     GuiField field[],
                      Vector<Pair<HexPoint, HexPoint>> arrows)
     {
-	m_width = w;
-	m_height = h;
-
-        setGeometry(w, h, bw, bh, 9.8, mirrored);
+        setGeometry(w, h, bw, bh, rotation, mirrored);
         
 	m_outline = calcCellOutlines(field);
 

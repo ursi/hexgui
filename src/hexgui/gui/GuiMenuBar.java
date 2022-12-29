@@ -566,6 +566,18 @@ public final class GuiMenuBar
 	m_orGroup.add(item);
 	menu.add(item);
 
+        menu.addSeparator();
+
+        JMenuItem item2 = new JMenuItem("Rotate left");
+        item2.addActionListener(m_listener);
+        item2.setActionCommand("gui-rotate-left");
+        menu.add(item2);
+
+        item2 = new JMenuItem("Rotate right");
+        item2.addActionListener(m_listener);
+        item2.setActionCommand("gui-rotate-right");
+        menu.add(item2);
+
 	return menu;
     }
 

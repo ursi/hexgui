@@ -173,6 +173,10 @@ public final class HexGui
 	    cmdGuiBoardDrawType();
         } else if (cmd.equals("gui_board_orientation")) {
 	    cmdGuiBoardOrientation();
+        } else if (cmd.equals("gui-rotate-left")) {
+	    cmdGuiBoardRotate(-1);
+        } else if (cmd.equals("gui-rotate-right")) {
+	    cmdGuiBoardRotate(1);
         } else if (cmd.equals("show-preferences")) {
             cmdShowPreferences();
         } else if (cmd.equals("gui-clear-marks")) {
@@ -856,6 +860,12 @@ public final class HexGui
 	String type = m_menubar.getCurrentBoardOrientation();
 	System.out.println(type);
 	m_guiboard.setOrientation(type);
+	m_guiboard.repaint();
+    }
+
+    private void cmdGuiBoardRotate(int amount)
+    {
+	m_guiboard.updateRotation(amount);
 	m_guiboard.repaint();
     }
 

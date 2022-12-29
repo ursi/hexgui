@@ -159,6 +159,13 @@ public final class GuiBoard
         repaint();
     }
 
+    public void updateRotation(int amount)
+    {
+        int rot = m_preferences.getInt("gui-board-rotation");
+        rot = (rot + amount + 12) % 12;
+        m_preferences.put("gui-board-rotation", rot);
+    }
+
     public void initSize(int w, int h)
     {
         initSize(m_mode, w, h);
@@ -640,8 +647,10 @@ public final class GuiBoard
                 mirrored = true;
             }
 
+            int rotation = m_preferences.getInt("gui-board-rotation");
+            
 	    m_drawer.draw(m_image.getGraphics(), 
-                          w, h, bw, bh, mirrored, 
+                          w, h, bw, bh, rotation, mirrored, 
                           ff, arrows);
 	    graphics.drawImage(m_image, 0, 0, null);
 	}

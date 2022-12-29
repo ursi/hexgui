@@ -17,6 +17,7 @@ public final class GuiPreferences
 	{ 
 	    {"gui-board-type",                    "Hex"},
 	    {"gui-board-orientation",             "positive"},
+	    {"gui-board-rotation",                "10"},
 	    {"gui-board-pixel-width",             "750"},
 	    {"gui-board-pixel-height",            "500"},
 	    {"gui-board-width",                   "11"},
