@@ -649,7 +649,7 @@ public final class GuiBoard
 
             int rotation = m_preferences.getInt("gui-board-rotation");
             
-	    m_drawer.draw(m_image.getGraphics(), 
+	    m_drawer.draw((Graphics2D)m_image.getGraphics(), 
                           w, h, bw, bh, rotation, mirrored, 
                           ff, arrows);
 	    graphics.drawImage(m_image, 0, 0, null);

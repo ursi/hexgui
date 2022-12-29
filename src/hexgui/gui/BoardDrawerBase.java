@@ -22,7 +22,6 @@ import java.awt.Image;
 import java.awt.FontMetrics;
 import java.awt.Font;
 import java.awt.RenderingHints;
-import java.awt.Graphics;
 
 import java.awt.event.*;
 import java.net.URL;
@@ -80,7 +79,7 @@ public abstract class BoardDrawerBase
         m_excentricity_acute = 0.5;
         m_excentricity_obtuse = 0.5;
         m_borderradius = 1.2;
-        m_margin = 0.5;
+        m_margin = 0.6;
         m_labelradius = 1.1;
 
         m_width = w;
@@ -177,7 +176,7 @@ public abstract class BoardDrawerBase
         @param field the fields to draw
         @param arrows the list of arrows to draw
     */
-    public void draw(Graphics g, 
+    public void draw(Graphics2D g, 
 		     int w, int h, int bw, int bh,
                      double rotation,
 		     boolean mirrored,
@@ -196,7 +195,6 @@ public abstract class BoardDrawerBase
 	drawShadows(g, field);
 	drawFields(g, field);
         drawAlpha(g, field);
-
         drawArrows(g, arrows);
     }
 
@@ -225,7 +223,7 @@ public abstract class BoardDrawerBase
 	@param g graphics context to draw to.
 	@param field the list of fields to draw.
     */
-    protected void drawCells(Graphics g, GuiField field[])
+    protected void drawCells(Graphics2D g, GuiField field[])
     {
 	g.setColor(Color.black);
 	for (int i=0; i<m_outline.length; i++) {
@@ -279,7 +277,7 @@ public abstract class BoardDrawerBase
         have been set with setGeometry.
         @param g graphics context to draw to.
     */
-    protected void drawEdges(Graphics g)
+    protected void drawEdges(Graphics2D g)
     {
         // 1-edge.
 
@@ -362,13 +360,13 @@ public abstract class BoardDrawerBase
         return (int)((m_fieldSize - 2*GuiField.getStoneMargin((int)m_fieldSize)) / 12);
     }
 
-    protected void drawBackground(Graphics g)
+    protected void drawBackground(Graphics2D g)
     {
 	if (m_background != null) 
 	    g.drawImage(m_background, 0, 0, m_width, m_height, null);
     }
 
-    protected void drawLabel(Graphics g, Point p, String string, int xoff)
+    protected void drawLabel(Graphics2D g, Point p, String string, int xoff)
     {
         double size = m_fieldSize * 0.4;
         Font f = g.getFont();
@@ -385,7 +383,7 @@ public abstract class BoardDrawerBase
         g.setFont(f);
     }
 
-    protected void drawLabels(Graphics g)
+    protected void drawLabels(Graphics2D g)
     {
         String string;
         Point2D.Double p;
@@ -408,15 +406,12 @@ public abstract class BoardDrawerBase
         }
     }
     
-    protected void drawShadows(Graphics graphics, GuiField[] field)
+    protected void drawShadows(Graphics2D graphics, GuiField[] field)
     {
         if (m_fieldSize <= 10)
             return;
-        Graphics2D graphics2D =
-            graphics instanceof Graphics2D ? (Graphics2D)graphics : null;
-        if (graphics2D == null)
-            return;
-        graphics2D.setComposite(COMPOSITE_3);
+
+        graphics.setComposite(COMPOSITE_3);
 
         // The following calculation is byzantine and should all be converted to double.
         // For now, we echo how the stone radius is determined in GuiField.
@@ -438,7 +433,7 @@ public abstract class BoardDrawerBase
         graphics.setPaintMode();
     }
 
-    protected void drawFields(Graphics g, GuiField field[])
+    protected void drawFields(Graphics2D g, GuiField field[])
     {
 	for (int x=0; x<field.length; x++) {
             Point p = getLocation(field[x].getPoint());
@@ -446,53 +441,43 @@ public abstract class BoardDrawerBase
 	}
     }
 
-    protected void drawAlpha(Graphics g, GuiField field[])
+    protected void drawAlpha(Graphics2D g, GuiField field[])
     {
-	if (g instanceof Graphics2D) {
-	    Graphics2D g2d = (Graphics2D)g;
-
-            for (int i=0; i<m_outline.length; i++) {
-                if ((field[i].getAttributes() & GuiField.DRAW_ALPHA) == 0)
-                    continue;
-
-                Color color = field[i].getAlphaColor();
-                if (color == null)
-                    continue;
-
-                g2d.setComposite(AlphaComposite.
-                                 getInstance(AlphaComposite.SRC_OVER, 
-                                             field[i].getAlphaBlend()));
-                
-                g2d.setColor(color);
-		g2d.fillPolygon(m_outline[i]);
-	    }
+        for (int i=0; i<m_outline.length; i++) {
+            if ((field[i].getAttributes() & GuiField.DRAW_ALPHA) == 0)
+                continue;
+            
+            Color color = field[i].getAlphaColor();
+            if (color == null)
+                continue;
+            
+            g.setComposite(AlphaComposite.
+                             getInstance(AlphaComposite.SRC_OVER, 
+                                         field[i].getAlphaBlend()));
+            
+            g.setColor(color);
+            g.fillPolygon(m_outline[i]);
 	}
     }
 
-    protected void drawArrows(Graphics g, 
+    protected void drawArrows(Graphics2D g, 
                               Vector<Pair<HexPoint,HexPoint>> arrows)
     {
-        if (g instanceof Graphics2D) {
-            Graphics2D g2d = (Graphics2D)g;
-            g2d.setColor(Color.BLUE);
-            for (int i=0; i<arrows.size(); i++) {
-                Point fm = getLocation(arrows.get(i).first);
-                Point to = getLocation(arrows.get(i).second);
-                drawArrow(g2d, fm.x, fm.y, to.x, to.y, 1.5);
-            }
+        g.setColor(Color.BLUE);
+        for (int i=0; i<arrows.size(); i++) {
+            Point fm = getLocation(arrows.get(i).first);
+            Point to = getLocation(arrows.get(i).second);
+            drawArrow(g, fm.x, fm.y, to.x, to.y, 1.5);
         }
     }
 
-    protected void setAntiAliasing(Graphics g)
+    protected void setAntiAliasing(Graphics2D g)
     {
-	if (g instanceof Graphics2D) {
-	    Graphics2D g2d = (Graphics2D)g;
-	    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				 RenderingHints.VALUE_ANTIALIAS_ON);
-	}
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
-    public static void drawArrow(Graphics g2d, int x1, int y1, 
+    public static void drawArrow(Graphics2D g2d, int x1, int y1, 
                                  int x2, int y2, double stroke) 
     {
         double aDir=Math.atan2(x1-x2,y1-y2);
