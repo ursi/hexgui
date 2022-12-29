@@ -38,7 +38,7 @@ import java.net.URL;
     GuiField class.
 
     <p>Board sizes supported are <code>m x n</code> where
-    <code>m</code> and <code>n</code> range from 1 to 26.  By
+    <code>m</code> and <code>n</code> range from 1 to 31.  By
     default, black connects top and bottom and should be labeled with
     letters.  White connects left and right and should be labeled with
     numbers.
@@ -70,6 +70,78 @@ public abstract class BoardDrawerBase
 	}
     }
 
+    /** Calculates and sets the geometry of the board. */
+    public void setGeometry(int w, int h, int bw, int bh, double rotation, boolean mirrored)
+    {
+        // Some fixed parameters. If borderradius = 1, the border just
+        // touches the outermost cells. If excentricity = 0, the
+        // corner circles are centered at the centers of the corner
+        // cells.
+        m_excentricity_acute = 0.5;
+        m_excentricity_obtuse = 0.5;
+        m_borderradius = 1.2;
+        m_margin = 10;
+
+        m_width = w;
+        m_height = h;
+        m_bwidth_new = bw;
+        m_bheight_new = bh;
+        m_rotation = rotation;
+        m_mirrored = mirrored;
+
+        // Intermediate coordinates. Here a1 = (0,0), and the distance
+        // between the centers of adjacent cells is 1. This is used to
+        // calculate the general orientation of the board before
+        // taking into account margins, centering, or the fact that
+        // Java's coordinate system is upside down. (In the
+        // intermediate coordinates, the y-axis points upwards).
+        double file_angle;
+        double rank_angle;
+        if (mirrored) {
+            file_angle = Math.PI/6 * (8 - rotation);
+            rank_angle = Math.PI/6 * (10 - rotation);
+        } else {
+            file_angle = Math.PI/6 * (10 - rotation);
+            rank_angle = Math.PI/6 * (8 - rotation);
+        }        
+        double dfX = Math.cos(file_angle);
+        double dfY = Math.sin(file_angle);
+        double drX = Math.cos(rank_angle);
+        double drY = Math.sin(rank_angle);
+
+        // Calculate the centers and radii of the four corner circles.
+        double r0 = (m_borderradius - m_excentricity_acute/2) / Math.sqrt(3);
+        double p0X = -1.0/3 * m_excentricity_acute * dfX - 1.0/3 * m_excentricity_acute * drX;
+        double p0Y = -1.0/3 * m_excentricity_acute * dfY - 1.0/3 * m_excentricity_acute * drY;
+        double p2X = (bw - 1 + 1.0/3 * m_excentricity_acute) * dfX + (bh - 1 + 1.0/3 * m_excentricity_acute) * drX;
+        double p2Y = (bw - 1 + 1.0/3 * m_excentricity_acute) * dfY + (bh - 1 + 1.0/3 * m_excentricity_acute) * drY;
+
+        double r1 = (m_borderradius - m_excentricity_obtuse/2) / Math.sqrt(3);
+        double p1X = (bw - 1 + 1.0/3 * m_excentricity_acute) * dfX - 1.0/3 * m_excentricity_acute * drX;
+        double p1Y = (bw - 1 + 1.0/3 * m_excentricity_acute) * dfY - 1.0/3 * m_excentricity_acute * drY;
+        double p3X = -1.0/3 * m_excentricity_acute * dfX + (bh - 1 + 1.0/3 * m_excentricity_acute) * drX;
+        double p3Y = -1.0/3 * m_excentricity_acute * dfY + (bh - 1 + 1.0/3 * m_excentricity_acute) * drY;
+
+        // Bounding box of the board, including borders.
+        double minX = Math.min(Math.min(p0X-r0, p1X-r1), Math.min(p2X-r0, p3X-r1));
+        double maxX = Math.max(Math.max(p0X+r0, p1X+r1), Math.max(p2X+r0, p3X+r1));
+        double minY = Math.min(Math.min(p0Y-r0, p1Y-r1), Math.min(p2Y-r0, p3Y-r1));
+        double maxY = Math.max(Math.max(p0Y+r0, p1Y+r1), Math.max(p2Y+r0, p3Y+r1));
+
+        // Scaling factor.
+        double scaleX = (w - 2*m_margin) / (maxX - minX);
+        double scaleY = (h - 2*m_margin) / (maxY - minY);
+        double scale = Math.min(scaleX, scaleY);
+
+        // Geometry.
+        m_dfileX = dfX * scale;
+        m_dfileY = -dfY * scale;
+        m_drankX = drX * scale;
+        m_drankY = -drY * scale;
+        m_originX = w/2.0 - scale * (minX + maxX)/2;
+        m_originY = h/2.0 + scale * (minY + maxY)/2;
+    }
+    
     /** Gets the field containing the specified point.
 	NOTE: uses the position of fields from the last call to draw().
 	Also assumes the set of fields given are the same as those in the
@@ -117,6 +189,13 @@ public abstract class BoardDrawerBase
 
         m_alphaontop = alphaontop;
 
+        if (!m_alphaontop) {
+            m_bwidth = bh;
+            m_bheight = bw;
+        }
+        
+        setGeometry(w, h, bw, bh, 10, !m_alphaontop);
+        
 	computeFieldPlacement();
 	m_outline = calcCellOutlines(field);
 
@@ -188,6 +267,109 @@ public abstract class BoardDrawerBase
 		g.drawPolygon(m_outline[i]);
 	    }
 	}
+        this.drawBoard(g);
+    }
+
+    /** An auxiliary function for adding a point to a polygon, using
+     Hex coordinates. Here a is the file, b is the rank, c, d, e
+     are offsets, and r, theta is a polar coordinate. */
+    protected void addHexPoint(Polygon p, double a, double b, double c, double d, double e, double r, double theta)
+    {
+        double xr = r * Math.cos(Math.PI * theta / 180) * Math.sqrt(3);
+        double yr = r * Math.sin(Math.PI * theta / 180);
+
+        a += (2*c + 1*d - e + yr + xr)/3;
+        b += (-c + 1*d + 2*e - 2*yr)/3;
+
+        double x = m_originX + m_dfileX * a + m_drankX * b;
+        double y = m_originY + m_dfileY * a + m_drankY * b;
+        p.addPoint((int)x, (int)y);
+    }
+    
+    /** Draws the board, according to the current geometry, which must
+        have been set with setGeometry.
+        @param g graphics context to draw to.
+    */
+    protected void drawBoard(Graphics g)
+    {
+        // Hexagons
+        for (int a=0; a<m_bwidth_new; a++) {
+            for (int b=0; b<m_bheight_new; b++) {
+                Polygon p = new Polygon();
+                this.addHexPoint(p, a, b, 1, 0, 0, 0, 0);
+                this.addHexPoint(p, a, b, 0, 1, 0, 0, 0);
+                this.addHexPoint(p, a, b, 0, 0, 1, 0, 0);
+                this.addHexPoint(p, a, b, -1, 0, 0, 0, 0);
+                this.addHexPoint(p, a, b, 0, -1, 0, 0, 0);
+                this.addHexPoint(p, a, b, 0, 0, -1, 0, 0);
+                g.drawPolygon(p);
+            }
+        }
+        // 1-edge.
+
+        double r0 = m_borderradius - m_excentricity_acute/2;
+        double r1 = m_borderradius - m_excentricity_obtuse/2;
+        
+        Polygon e1 = new Polygon();
+        // While the Graphics class can draw arc segments, it can't join them with other segments.
+        // So we approximate the arc by a polygon.
+        for (int theta = 90; theta <= 150; theta += 10) {
+            this.addHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
+        }
+        for (int a=0; a<m_bwidth_new; a++) {
+            this.addHexPoint(e1, a, 0, 0, -1, 0, 0, 0);
+            this.addHexPoint(e1, a, 0, 0, 0, -1, 0, 0);
+        }
+        this.addHexPoint(e1, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
+        for (int theta = 60; theta <= 90; theta += 10) {
+            this.addHexPoint(e1, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+        }
+            
+        Polygon e2 = new Polygon();
+        for (int theta = 210; theta >= 150; theta -= 10) {
+            this.addHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
+        }
+        for (int b=0; b<m_bheight_new; b++) {
+            this.addHexPoint(e2, 0, b, 0, -1, 0, 0, 0);
+            this.addHexPoint(e2, 0, b, -1, 0, 0, 0, 0);
+        }
+        this.addHexPoint(e2, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
+        for (int theta = 240; theta >= 210; theta -= 10) {
+            this.addHexPoint(e2, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+        }
+            
+        Polygon e3 = new Polygon();
+        for (int theta = -90; theta <= -30; theta += 10) {
+            this.addHexPoint(e3, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
+        }
+        for (int a=m_bwidth_new-1; a >= 0; a--) {
+            this.addHexPoint(e3, a, m_bheight_new-1, 0, 1, 0, 0, 0);
+            this.addHexPoint(e3, a, m_bheight_new-1, 0, 0, 1, 0, 0);
+        }
+        this.addHexPoint(e3, 0, m_bheight_new-1, -0.5, 0, 0.5, 0, 0);
+        for (int theta = -120; theta <= -90; theta += 10) {
+            this.addHexPoint(e3, 0, m_bheight_new-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
+        }
+            
+        Polygon e4 = new Polygon();
+        for (int theta = 30; theta >= -30; theta -= 10) {
+            this.addHexPoint(e4, m_bwidth_new-1, m_bheight_new-1, 0, m_excentricity_acute, 0, r0, theta);
+        }
+        for (int b=m_bheight_new-1; b >= 0; b--) {
+            this.addHexPoint(e4, m_bwidth_new-1, b, 0, 1, 0, 0, 0);
+            this.addHexPoint(e4, m_bwidth_new-1, b, 1, 0, 0, 0, 0);
+        }
+        this.addHexPoint(e4, m_bwidth_new-1, 0, 0.5, 0, -0.5, 0, 0);
+        for (int theta = 60; theta >= 30; theta -= 10) {
+            this.addHexPoint(e4, m_bwidth_new-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
+        }
+            
+        g.fillPolygon(e1);
+        g.fillPolygon(e3);
+        g.drawPolygon(e1);
+        g.drawPolygon(e2);
+        g.drawPolygon(e3);
+        g.drawPolygon(e4);
     }
 
     protected void computeFieldPlacement()
@@ -355,17 +537,39 @@ public abstract class BoardDrawerBase
     private static int yCor(int len, double dir) {return (int)(len * Math.cos(dir));}
     private static int xCor(int len, double dir) {return (int)(len * Math.sin(dir));}
 
-
     protected boolean m_alphaontop;
 
     protected double m_aspect_ratio;
 
     protected Image m_background;
 
-    protected int m_width, m_height;
-    protected int m_bwidth, m_bheight;
+    protected int m_width, m_height; // the width and height of the canvas
+    protected int m_bwidth_new, m_bheight_new; // the width (files) and height (ranks) of the board
+
+    protected double m_rotation; // clock direction of the a1 cell:
+                                 // 9=left (diamond orientation),
+                                 // 10=upper left (flat orientation).
+    protected boolean m_mirrored; // mirror the board?
+
+    // Fixed parameters.
+    protected double m_excentricity_acute;
+    protected double m_excentricity_obtuse;
+    protected double m_borderradius;
+    protected double m_margin;
+    
+    // Computed geometry of the board.
+    protected double m_originX, m_originY;  // Location of the a1 cell.
+    protected double m_dfileX, m_dfileY;      // Vector from a1 to b1.
+    protected double m_drankX, m_drankY;      // Vector from a1 to a2.
+
+    protected int m_fieldRadius;   // for stone size, label size etc.
+
+    // Old
     protected int m_marginX, m_marginY;
-    protected int m_fieldWidth, m_fieldHeight, m_fieldRadius, m_step;
+    protected int m_fieldWidth, m_fieldHeight, m_step;
+    protected int m_bwidth, m_bheight; // the width (files) and height (ranks) of the board
+   
+    // Cell outlines.
     protected Polygon m_outline[];
 
     protected static final AlphaComposite COMPOSITE_3

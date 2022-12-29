@@ -718,8 +718,6 @@ public final class GuiBoard
             }
             
 	    if (flip) {
-		bw = m_height;
-		bh = m_width;
 		alphaontop = false;
 		ff = flipFields(m_field);
 
