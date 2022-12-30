@@ -6,7 +6,6 @@ package hexgui.gui;
 
 import javax.swing.*;          
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.AlphaComposite;
 import java.awt.FontMetrics;
@@ -178,28 +177,21 @@ public class GuiField
         return paint;
     }
 
-    public void draw(Graphics g, int x, int y, int w, int h)
+    public void draw(Graphics2D g, int x, int y, int w, int h, double stoneradius)
     {
-	if (!g.hitClip(x, y, w, h))
-            return;
-
 	m_width = w;
 	m_height = h;
 
 	m_radius = (h < w) ? h/2 : w/2;
-	m_margin = getStoneMargin(m_radius*2);
+	m_margin = getStoneMargin_new(m_radius*2);
+        m_stoneradius = stoneradius;
 
-	m_graphics = g.create(x-w/2,y-h/2,w,h);
-	if (m_graphics instanceof Graphics2D) {
-	    m_graphics2D = (Graphics2D)m_graphics;
-        } else {
-	    m_graphics2D = null;
-        }
+	m_graphics = (Graphics2D)g.create(x-w/2,y-h/2,w,h);
 	
 	if (m_color == HexColor.WHITE) {
-	    drawStone(COLOR_STONE_WHITE, COLOR_STONE_WHITE_BRIGHT);
+	    drawStone(COLOR_STONE_WHITE, COLOR_STONE_WHITE_BRIGHT, stoneradius);
         } else if (m_color == HexColor.BLACK) {
-	    drawStone(COLOR_STONE_BLACK, COLOR_STONE_BLACK_BRIGHT);
+	    drawStone(COLOR_STONE_BLACK, COLOR_STONE_BLACK_BRIGHT, stoneradius * 1.01);
         }
         
 	if ((m_attributes & LAST_PLAYED) != 0) {
@@ -220,19 +212,12 @@ public class GuiField
 	
     }
     
-    private void drawStone(Color normal, Color bright)
+    private void drawStone(Color normal, Color bright, double size)
     {
-	if (m_graphics2D != null) {
-	    RadialGradientPaint paint = getPaint(m_width, m_height, 
-						 normal, bright);
-	    m_graphics2D.setPaint(paint);
-	} else {
-	    m_graphics.setColor(normal);
-	}
+        RadialGradientPaint paint = getPaint(m_width, m_height, normal, bright);
+        m_graphics.setPaint(paint);
 
-	int size = m_radius - m_margin;
-	m_graphics.fillOval(m_width/2 - size, m_height/2 - size,
-			    size*2, size*2);
+	m_graphics.fill(new Ellipse2D.Double(m_width/2 - size, m_height/2 - size, size*2, size*2));
 
 	m_graphics.setPaintMode();
     }
@@ -240,8 +225,8 @@ public class GuiField
     private void drawLastPlayed()
     {
 	m_graphics.setColor(Color.gray);
-        int size = (m_radius - m_margin) / 6;
-	m_graphics.fillOval(m_width/2 - size, m_height/2 - size, 2*size, 2*size);
+        double size = (m_radius - m_margin) / 6;
+	m_graphics.fill(new Ellipse2D.Double(m_width/2 - size, m_height/2 - size, 2*size, 2*size));
     }
 
     /** Draw the given string centered at the coordinates (x,y) in the
@@ -274,10 +259,8 @@ public class GuiField
     {
 	if (m_alpha_color == null)
 	    return;
-	if (m_graphics2D == null)
-	    return;
 
-	m_graphics2D.setComposite(AlphaComposite.
+	m_graphics.setComposite(AlphaComposite.
 				  getInstance(AlphaComposite.SRC_OVER, 
                                               0.3f));
 	m_graphics.setColor(m_alpha_color);
@@ -322,11 +305,11 @@ public class GuiField
 
     private int m_width;
     private int m_height;
-    private int m_radius;
-    private int m_margin;
-
-    private Graphics m_graphics;
-    private Graphics2D m_graphics2D;
+    private double m_radius;
+    private double m_margin;
+    private double m_stoneradius;
+    
+    private Graphics2D m_graphics;
 }
 
 //----------------------------------------------------------------------------
