@@ -14,6 +14,7 @@ import javax.swing.*;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Path2D;
+import java.awt.geom.Arc2D;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Color;
@@ -101,16 +102,16 @@ public abstract class BoardDrawerBase
         double file_angle;
         double rank_angle;
         if (mirrored) {
-            file_angle = Math.PI/6 * (8 - rotation);
-            rank_angle = Math.PI/6 * (10 - rotation);
+            file_angle = 30 * (8 - rotation);
+            rank_angle = 30 * (10 - rotation);
         } else {
-            file_angle = Math.PI/6 * (10 - rotation);
-            rank_angle = Math.PI/6 * (8 - rotation);
+            file_angle = 30 * (10 - rotation);
+            rank_angle = 30 * (8 - rotation);
         }        
-        double dfX = Math.cos(file_angle);
-        double dfY = Math.sin(file_angle);
-        double drX = Math.cos(rank_angle);
-        double drY = Math.sin(rank_angle);
+        double dfX = Math.cos(file_angle * Math.PI / 180);
+        double dfY = Math.sin(file_angle * Math.PI / 180);
+        double drX = Math.cos(rank_angle * Math.PI / 180);
+        double drY = Math.sin(rank_angle * Math.PI / 180);
 
         // Calculate the centers and radii of the four corner circles.
         double r0 = (m_borderradius - m_excentricity_acute/2) / Math.sqrt(3);
@@ -143,7 +144,9 @@ public abstract class BoardDrawerBase
         m_drankY = -drY * scale;
         m_originX = w/2.0 - scale * (minX + maxX)/2;
         m_originY = h/2.0 + scale * (minY + maxY)/2;
-        m_fieldSize = scale;
+        m_scale = scale;
+        m_angle0 = file_angle;
+        m_dangle = m_mirrored ? -1 : 1;
     }
     
     /** Gets the field containing the specified point.
@@ -230,7 +233,7 @@ public abstract class BoardDrawerBase
     */
     protected void drawCells(Graphics2D g, GuiField field[])
     {
-        g.setStroke(new BasicStroke((float)(m_strokewidth * m_fieldSize)));
+        g.setStroke(new BasicStroke((float)(m_strokewidth * m_scale)));
 
 	g.setColor(Color.black);
 	for (int i=0; i<m_outlines.length; i++) {
@@ -291,6 +294,21 @@ public abstract class BoardDrawerBase
         p.lineTo(point.x, point.y);
     }
 
+    /** An auxiliary function for adding an arc to a path, using
+     Hex coordinates. Here a is the file, b is the rank, c, d, e
+     are offsets, and r, theta, and dtheta are polar coordinates. */
+    protected void arcAboutHexPoint(Path2D p, double a, double b, double c, double d, double e, double r, double theta0, double theta1)
+    {
+        Point2D.Double center = hexPoint(a, b, c, d, e, 0, 0);
+        double angle0 = m_angle0 + m_dangle * theta0;
+        double angle1 = m_angle0 + m_dangle * theta1;
+        double dangle = angle1 - angle0;
+        double radius = r * m_scale / Math.sqrt(3);
+        Arc2D arc = new Arc2D.Double();
+        arc.setArcByCenter(center.x, center.y, radius, angle0, dangle, Arc2D.OPEN);
+        p.append(arc, true);
+    }
+
     protected Point getLocation(HexPoint p)
     {
         Point2D.Double pp = hexPoint(p.x, p.y, 0, 0, 0, 0, 0);
@@ -310,62 +328,46 @@ public abstract class BoardDrawerBase
         
         Path2D e1 = new Path2D.Double();
         moveToHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, 90);
-        for (int theta = 90; theta <= 150; theta += 10) {
-            lineToHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
-        }
+        arcAboutHexPoint(e1, 0, 0, 0, -m_excentricity_acute, 0, r0, 90, 150);
         for (int a=0; a<m_bwidth; a++) {
             lineToHexPoint(e1, a, 0, 0, -1, 0, 0, 0);
             lineToHexPoint(e1, a, 0, 0, 0, -1, 0, 0);
         }
         lineToHexPoint(e1, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
-        for (int theta = 60; theta <= 90; theta += 10) {
-            lineToHexPoint(e1, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
-        }
+        arcAboutHexPoint(e1, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, 60, 90);
         e1.closePath();
             
         Path2D e2 = new Path2D.Double();
         moveToHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, 210);
-        for (int theta = 210; theta >= 150; theta -= 10) {
-            lineToHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, theta);
-        }
+        arcAboutHexPoint(e2, 0, 0, 0, -m_excentricity_acute, 0, r0, 210, 150);
         for (int b=0; b<m_bheight; b++) {
             lineToHexPoint(e2, 0, b, 0, -1, 0, 0, 0);
             lineToHexPoint(e2, 0, b, -1, 0, 0, 0, 0);
         }
         lineToHexPoint(e2, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
-        for (int theta = 240; theta >= 210; theta -= 10) {
-            lineToHexPoint(e2, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
-        }
+        arcAboutHexPoint(e2, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, 240, 210);
         e2.closePath();
             
         Path2D e3 = new Path2D.Double();
         moveToHexPoint(e3, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, -90);
-        for (int theta = -90; theta <= -30; theta += 10) {
-            lineToHexPoint(e3, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
-        }
+        arcAboutHexPoint(e3, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, -90, -30);
         for (int a=m_bwidth-1; a >= 0; a--) {
             lineToHexPoint(e3, a, m_bheight-1, 0, 1, 0, 0, 0);
             lineToHexPoint(e3, a, m_bheight-1, 0, 0, 1, 0, 0);
         }
         lineToHexPoint(e3, 0, m_bheight-1, -0.5, 0, 0.5, 0, 0);
-        for (int theta = -120; theta <= -90; theta += 10) {
-            lineToHexPoint(e3, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, theta);
-        }
+        arcAboutHexPoint(e3, 0, m_bheight-1, -m_excentricity_obtuse/3, 0, m_excentricity_obtuse/3, r1, -120, -90);
         e3.closePath();
             
         Path2D e4 = new Path2D.Double();
         moveToHexPoint(e4, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, 30);
-        for (int theta = 30; theta >= -30; theta -= 10) {
-            lineToHexPoint(e4, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, theta);
-        }
+        arcAboutHexPoint(e4, m_bwidth-1, m_bheight-1, 0, m_excentricity_acute, 0, r0, 30, -30);
         for (int b=m_bheight-1; b >= 0; b--) {
             lineToHexPoint(e4, m_bwidth-1, b, 0, 1, 0, 0, 0);
             lineToHexPoint(e4, m_bwidth-1, b, 1, 0, 0, 0, 0);
         }
         lineToHexPoint(e4, m_bwidth-1, 0, 0.5, 0, -0.5, 0, 0);
-        for (int theta = 60; theta >= 30; theta -= 10) {
-            lineToHexPoint(e4, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, theta);
-        }
+        arcAboutHexPoint(e4, m_bwidth-1, 0, m_excentricity_obtuse/3, 0, -m_excentricity_obtuse/3, r1, 60, 30);
         e4.closePath();
 
 	g.setColor(Color.black);
@@ -376,7 +378,7 @@ public abstract class BoardDrawerBase
         g.fill(e2);
         g.fill(e4);
 
-        g.setStroke(new BasicStroke((float)(m_strokewidth * m_fieldSize)));
+        g.setStroke(new BasicStroke((float)(m_strokewidth * m_scale)));
         g.setColor(Color.black);
         g.draw(e1);
         g.draw(e2);
@@ -388,7 +390,7 @@ public abstract class BoardDrawerBase
 
     protected int getShadowOffset()
     {
-        return (int)((m_fieldSize - 2*GuiField.getStoneMargin((int)m_fieldSize)) / 12);
+        return (int)((m_scale - 2*GuiField.getStoneMargin((int)m_scale)) / 12);
     }
 
     protected void drawBackground(Graphics2D g)
@@ -399,7 +401,7 @@ public abstract class BoardDrawerBase
 
     protected void drawLabel(Graphics2D g, Point p, String string, int xoff)
     {
-        double size = m_fieldSize * 0.4;
+        double size = m_scale * 0.4;
         Font f = g.getFont();
         Font f2 = f.deriveFont((float)size);
 
@@ -439,14 +441,14 @@ public abstract class BoardDrawerBase
     
     protected void drawShadows(Graphics2D graphics, GuiField[] field)
     {
-        if (m_fieldSize <= 10)
+        if (m_scale <= 10)
             return;
 
         graphics.setComposite(COMPOSITE_3);
 
         // The following calculation is byzantine and should all be converted to double.
         // For now, we echo how the stone radius is determined in GuiField.
-        int w = (int)m_fieldSize;
+        int w = (int)m_scale;
         int rad = w/2;
         int mar = GuiField.getStoneMargin(rad*2);
         int size = rad - mar;
@@ -468,7 +470,7 @@ public abstract class BoardDrawerBase
     {
 	for (int x=0; x<field.length; x++) {
             Point p = getLocation(field[x].getPoint());
-	    field[x].draw(g, p.x, p.y, (int)m_fieldSize, (int)m_fieldSize);
+	    field[x].draw(g, p.x, p.y, (int)m_scale, (int)m_scale);
 	}
     }
 
@@ -552,10 +554,11 @@ public abstract class BoardDrawerBase
     
     // Computed geometry of the board.
     protected double m_originX, m_originY;  // Location of the a1 cell.
-    protected double m_dfileX, m_dfileY;      // Vector from a1 to b1.
-    protected double m_drankX, m_drankY;      // Vector from a1 to a2.
-
-    protected double m_fieldSize;   // for stone size, label size etc.
+    protected double m_dfileX, m_dfileY;    // Vector from a1 to b1.
+    protected double m_drankX, m_drankY;    // Vector from a1 to a2.
+    protected double m_angle0, m_dangle;    // Transformation of angles.
+    
+    protected double m_scale;   // for stone size, label size etc.
     
     // Cell outlines.
     protected Path2D m_outlines[];
