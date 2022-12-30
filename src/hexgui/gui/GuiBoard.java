@@ -166,6 +166,11 @@ public final class GuiBoard
         m_preferences.put("gui-board-rotation", rot);
     }
 
+    public void setRotation(int rot)
+    {
+        m_preferences.put("gui-board-rotation", rot);
+    }
+
     public void initSize(int w, int h)
     {
         initSize(m_mode, w, h);

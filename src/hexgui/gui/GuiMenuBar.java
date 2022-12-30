@@ -551,6 +551,13 @@ public final class GuiMenuBar
 
 	String pref = m_preferences.get("gui-board-orientation");
 
+        JMenuItem item2 = new JMenuItem("Default orientation");
+        item2.addActionListener(m_listener);
+        item2.setActionCommand("gui-default-orientation");
+        menu.add(item2);
+
+        menu.addSeparator();
+
 	JRadioButtonMenuItem item;
 	item = new JRadioButtonMenuItem("Positive");
 	item.addActionListener(m_listener);
@@ -568,7 +575,7 @@ public final class GuiMenuBar
 
         menu.addSeparator();
 
-        JMenuItem item2 = new JMenuItem("Rotate left");
+        item2 = new JMenuItem("Rotate left");
         item2.addActionListener(m_listener);
         item2.setActionCommand("gui-rotate-left");
         menu.add(item2);
@@ -589,6 +596,22 @@ public final class GuiMenuBar
 	    b = (AbstractButton)e.nextElement();
 	}
 	return b.getText();
+    }	
+
+    public void setCurrentBoardOrientation(String s)
+    {
+        Enumeration e = m_orGroup.getElements();
+	AbstractButton b = (AbstractButton)e.nextElement();
+	while (true) {
+            if (b.getText() == s) {
+                b.setSelected(true);
+                break;
+            }
+            if (!e.hasMoreElements()) {
+                break;
+            }
+	    b = (AbstractButton)e.nextElement();
+	}
     }	
 
     //----------------------------------------------------------------------

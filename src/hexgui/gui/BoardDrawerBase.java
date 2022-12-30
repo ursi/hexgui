@@ -189,7 +189,7 @@ public abstract class BoardDrawerBase
 		     GuiField field[],
                      Vector<Pair<HexPoint, HexPoint>> arrows)
     {
-        setGeometry(w, h, bw, bh, rotation-0.1, mirrored); // ###
+        setGeometry(w, h, bw, bh, rotation, mirrored);
         
 	m_outlines = calcCellOutlines(field);
 
