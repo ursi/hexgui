@@ -133,16 +133,19 @@ public final class GuiMenuBar
 	JMenuItem item;
 
 	item = new JMenuItem("New Program...");
+	item.setMnemonic(KeyEvent.VK_N);
 	item.addActionListener(m_listener);
 	item.setActionCommand("new-program");
  	menu.add(item);
 
 	item = new JMenuItem("Edit Program...");
+	item.setMnemonic(KeyEvent.VK_E);
 	item.addActionListener(m_listener);
 	item.setActionCommand("edit-program");
  	menu.add(item);
         
 	item = new JMenuItem("Delete Program...");
+	item.setMnemonic(KeyEvent.VK_L);
 	item.addActionListener(m_listener);
 	item.setActionCommand("delete-program");
  	menu.add(item);
@@ -150,6 +153,7 @@ public final class GuiMenuBar
  	menu.addSeparator();
 
 	item = new JMenuItem("Connect Local Program...");
+	item.setMnemonic(KeyEvent.VK_C);
 	item.addActionListener(m_listener);
 	item.setActionCommand("connect-local-program");
 	m_connect_local = item;
@@ -165,12 +169,14 @@ public final class GuiMenuBar
  	menu.addSeparator();
 
 	item = new JMenuItem("Reconnect Program");
+	item.setMnemonic(KeyEvent.VK_R);
 	item.addActionListener(m_listener);
 	item.setActionCommand("reconnect-program");
 	m_reconnect = item;
  	menu.add(item);
 
 	item = new JMenuItem("Disconnect Program");
+	item.setMnemonic(KeyEvent.VK_D);
 	item.addActionListener(m_listener);
 	item.setActionCommand("disconnect-program");
 	m_disconnect = item;
@@ -208,6 +214,7 @@ public final class GuiMenuBar
         menu.addSeparator();
 
         m_swap_pieces = new JMenuItem("Swap pieces");
+	m_swap_pieces.setMnemonic(KeyEvent.VK_S);
         m_swap_pieces.addActionListener(m_listener);
         m_swap_pieces.setActionCommand("game_swap_pieces");
         menu.add(m_swap_pieces);
@@ -218,26 +225,31 @@ public final class GuiMenuBar
         menu.add(m_swap_sides);
 
 	m_pass = new JMenuItem("Pass");
+	m_pass.setMnemonic(KeyEvent.VK_P);
         m_pass.addActionListener(m_listener);
         m_pass.setActionCommand("game_pass");
 	menu.add(m_pass);
 
 	m_resign = new JMenuItem("Resign");
+	m_resign.setMnemonic(KeyEvent.VK_R);
         m_resign.addActionListener(m_listener);
         m_resign.setActionCommand("game_resign");
 	menu.add(m_resign);
 
 	m_forfeit = new JMenuItem("Forfeit");
+	m_forfeit.setMnemonic(KeyEvent.VK_F);
         m_forfeit.addActionListener(m_listener);
         m_forfeit.setActionCommand("game_forfeit");
 	menu.add(m_forfeit);
 
 	m_addsetup = new JMenuItem("Add setup node");
+	m_addsetup.setMnemonic(KeyEvent.VK_A);
         m_addsetup.addActionListener(m_listener);
         m_addsetup.setActionCommand("game_addsetup");
 	menu.add(m_addsetup);
 
         m_genmove = new JMenuItem("Generate Computer Move");
+	m_genmove.setMnemonic(KeyEvent.VK_G);
         m_genmove.addActionListener(m_listener);
         m_genmove.setActionCommand("genmove");
         menu.add(m_genmove);
@@ -245,11 +257,13 @@ public final class GuiMenuBar
         menu.addSeparator();
         
         item = new JMenuItem("Delete Current Branch");
+	item.setMnemonic(KeyEvent.VK_D);
         item.addActionListener(m_listener);
         item.setActionCommand("game_delete_branch");
         menu.add(item);
 
         item = new JMenuItem("Make Main Branch");
+	item.setMnemonic(KeyEvent.VK_M);
         item.addActionListener(m_listener);
         item.setActionCommand("game_make_main_branch");
         menu.add(item);
@@ -340,6 +354,7 @@ public final class GuiMenuBar
 	
 	JMenuItem item;
 	item = new JMenuItem("Preferences...");
+	item.setMnemonic(KeyEvent.VK_P);
 	item.addActionListener(m_listener);
 	item.setActionCommand("show-preferences");
 
@@ -351,6 +366,7 @@ public final class GuiMenuBar
     private JMenu createBoardSizeMenu()
     {
         JMenu menu = new JMenu("Board Size");
+	menu.setMnemonic(KeyEvent.VK_B);
 	m_bsGroup = new ButtonGroup();
 
 	String sizes[] = new String[] 
@@ -399,6 +415,7 @@ public final class GuiMenuBar
 	menu.addSeparator();
 
 	item = new JRadioButtonMenuItem("Other...");
+	item.setMnemonic(KeyEvent.VK_O);
 	item.addActionListener(m_listener);
 	item.setActionCommand("newgame");
 	item.setSelected(true);
@@ -462,6 +479,7 @@ public final class GuiMenuBar
 	menu.setMnemonic(KeyEvent.VK_V);
 
 	m_toolbar_visible = new JCheckBoxMenuItem("Show Toolbar");
+	m_toolbar_visible.setMnemonic(KeyEvent.VK_T);
 	if (m_preferences.getBoolean("gui-toolbar-visible"))
 	    m_toolbar_visible.setState(true);  
 	m_toolbar_visible.addActionListener(m_listener);
@@ -469,12 +487,14 @@ public final class GuiMenuBar
 	menu.add(m_toolbar_visible);
 
 	m_shell_visible = new JCheckBoxMenuItem("Show Shell");
+	m_shell_visible.setMnemonic(KeyEvent.VK_S);
 	m_shell_visible.addActionListener(m_listener);
 	m_shell_visible.setActionCommand("gui_shell_visible");
 	m_shell_visible.setEnabled(false);
 	menu.add(m_shell_visible);
 
 	m_analyze_visible = new JCheckBoxMenuItem("Show Analyze");
+	m_analyze_visible.setMnemonic(KeyEvent.VK_A);
 	m_analyze_visible.addActionListener(m_listener);
 	m_analyze_visible.setActionCommand("gui_analyze_visible");
 	m_analyze_visible.setEnabled(false);
@@ -483,6 +503,7 @@ public final class GuiMenuBar
 	menu.addSeparator();
 
         JMenuItem item = new JMenuItem("Clear Marks");
+	item.setMnemonic(KeyEvent.VK_C);
         item.addActionListener(m_listener);
         item.setActionCommand("gui-clear-marks");
         menu.add(item);
@@ -491,9 +512,11 @@ public final class GuiMenuBar
 
 	JMenu view;
 	view = createBoardViewMenu();
+	view.setMnemonic(KeyEvent.VK_B);
 	menu.add(view);
 
 	view = createOrientationViewMenu();
+	view.setMnemonic(KeyEvent.VK_O);
 	menu.add(view);
 
 	return menu;
@@ -536,11 +559,13 @@ public final class GuiMenuBar
         */
 
         JMenuItem item2 = new JMenuItem("Flat");
+	item2.setMnemonic(KeyEvent.VK_F);
         item2.addActionListener(m_listener);
         item2.setActionCommand("gui-flat-orientation");
         menu.add(item2);
 
         item2 = new JMenuItem("Diamond");
+	item2.setMnemonic(KeyEvent.VK_D);
         item2.addActionListener(m_listener);
         item2.setActionCommand("gui-diamond-orientation");
         menu.add(item2);
@@ -567,6 +592,7 @@ public final class GuiMenuBar
 
 	JRadioButtonMenuItem item;
 	item = new JRadioButtonMenuItem("Positive");
+	item.setMnemonic(KeyEvent.VK_P);
 	item.addActionListener(m_listener);
 	item.setActionCommand("gui_board_orientation");
 	if (pref.equals("positive")) item.setSelected(true);
@@ -574,6 +600,7 @@ public final class GuiMenuBar
 	menu.add(item);
 
 	item = new JRadioButtonMenuItem("Negative");
+	item.setMnemonic(KeyEvent.VK_N);
 	item.addActionListener(m_listener);
 	item.setActionCommand("gui_board_orientation");
 	if (pref.equals("negative")) item.setSelected(true);
@@ -583,11 +610,13 @@ public final class GuiMenuBar
         menu.addSeparator();
 
         JMenuItem item2 = new JMenuItem("Rotate left");
+	item2.setMnemonic(KeyEvent.VK_L);
         item2.addActionListener(m_listener);
         item2.setActionCommand("gui-rotate-left");
         menu.add(item2);
 
         item2 = new JMenuItem("Rotate right");
+	item2.setMnemonic(KeyEvent.VK_R);
         item2.addActionListener(m_listener);
         item2.setActionCommand("gui-rotate-right");
         menu.add(item2);
