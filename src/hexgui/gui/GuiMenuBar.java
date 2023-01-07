@@ -506,6 +506,7 @@ public final class GuiMenuBar
 
 	String defaultType = m_preferences.get("gui-board-type");
 
+        /*
 	JRadioButtonMenuItem item;
 	item = new JRadioButtonMenuItem("Hex");
 	item.addActionListener(m_listener);
@@ -530,6 +531,19 @@ public final class GuiMenuBar
 	    item.setSelected(true);
 	m_btGroup.add(item);
 	menu.add(item);
+        
+        menu.addSeparator();
+        */
+
+        JMenuItem item2 = new JMenuItem("Flat");
+        item2.addActionListener(m_listener);
+        item2.setActionCommand("gui-flat-orientation");
+        menu.add(item2);
+
+        item2 = new JMenuItem("Diamond");
+        item2.addActionListener(m_listener);
+        item2.setActionCommand("gui-diamond-orientation");
+        menu.add(item2);
 
 	return menu;
     }
@@ -551,13 +565,6 @@ public final class GuiMenuBar
 
 	String pref = m_preferences.get("gui-board-orientation");
 
-        JMenuItem item2 = new JMenuItem("Default orientation");
-        item2.addActionListener(m_listener);
-        item2.setActionCommand("gui-default-orientation");
-        menu.add(item2);
-
-        menu.addSeparator();
-
 	JRadioButtonMenuItem item;
 	item = new JRadioButtonMenuItem("Positive");
 	item.addActionListener(m_listener);
@@ -575,7 +582,7 @@ public final class GuiMenuBar
 
         menu.addSeparator();
 
-        item2 = new JMenuItem("Rotate left");
+        JMenuItem item2 = new JMenuItem("Rotate left");
         item2.addActionListener(m_listener);
         item2.setActionCommand("gui-rotate-left");
         menu.add(item2);

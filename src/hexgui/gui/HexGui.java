@@ -173,8 +173,10 @@ public final class HexGui
 	    cmdGuiBoardDrawType();
         } else if (cmd.equals("gui_board_orientation")) {
 	    cmdGuiBoardOrientation();
-        } else if (cmd.equals("gui-default-orientation")) {
-	    cmdGuiBoardDefaultOrientation();
+        } else if (cmd.equals("gui-flat-orientation")) {
+	    cmdGuiBoardSetOrientation(10, false);
+        } else if (cmd.equals("gui-diamond-orientation")) {
+	    cmdGuiBoardSetOrientation(9, false);
         } else if (cmd.equals("gui-rotate-left")) {
 	    cmdGuiBoardRotate(-1);
         } else if (cmd.equals("gui-rotate-right")) {
@@ -865,11 +867,16 @@ public final class HexGui
 	m_guiboard.repaint();
     }
 
-    private void cmdGuiBoardDefaultOrientation()
+    private void cmdGuiBoardSetOrientation(int rot, boolean mirrored)
     {
-        m_menubar.setCurrentBoardOrientation("Positive");
-	m_guiboard.setOrientation("Positive");
-	m_guiboard.setRotation(9);
+        if (!mirrored) {
+            m_menubar.setCurrentBoardOrientation("Positive");
+            m_guiboard.setOrientation("Positive");
+        } else {
+            m_menubar.setCurrentBoardOrientation("Negative");
+            m_guiboard.setOrientation("Negative");
+        }            
+	m_guiboard.setRotation(rot);
 	m_guiboard.repaint();
     }
 
