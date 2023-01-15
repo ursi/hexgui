@@ -25,7 +25,7 @@
 
                  meta =
                    { description = "HexGui";
-                     longDescription = "GUI for the board game Hex (and Y)";
+                     longDescription = "GUI for the board game Hex";
                    };
                };
 
