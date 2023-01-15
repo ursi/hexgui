@@ -73,9 +73,9 @@ public final class GuiBoard
 		GuiField f = m_drawer.getFieldContaining(e.getPoint(), m_field);
 		if (f == null) return;
 
-                int modifiers = e.getModifiers();
-                boolean ctrl = (modifiers & ActionEvent.CTRL_MASK) != 0;
-                boolean shift = (modifiers & ActionEvent.SHIFT_MASK) != 0;
+                int modifiers = e.getModifiersEx();
+                boolean ctrl = (modifiers & InputEvent.CTRL_DOWN_MASK) != 0;
+                boolean shift = (modifiers & InputEvent.SHIFT_DOWN_MASK) != 0;
                 if (e.getClickCount() >= 2)
                     m_listener.fieldDoubleClicked(f.getPoint(), ctrl, shift);
                 else
@@ -125,37 +125,19 @@ public final class GuiBoard
     }
     
     /** Sets the type of board drawer to use.  If <code>name</code> is
-	not one of the known values, "Diamond" is used.
-	@param name one of ("Diamond", "Flat", "Flat2", "Go"). 
+	not one of the known values, "Hex" is used.
+	@param name one of ("Hex", "Go", "Y"). 
     */
     public void setDrawType(String name)
     {
-        if (name.equals("Y")) {
-            m_drawer = new BoardDrawerY();
-            initSize(YBOARD, m_width, m_height);
-        } else if (name.equals("Go")) {
+        if (name.equals("Hex")) {
             if (m_mode != HEXBOARD)
                 initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerGo();
-	    m_preferences.put("gui-board-type", "Go");
-	} else if (name.equals("Diamond")) {
-            if (m_mode != HEXBOARD)
-                initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerDiamond();
-	    m_preferences.put("gui-board-type", "Diamond");
-	} else if (name.equals("Flat")) {
-            if (m_mode != HEXBOARD)
-                initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerFlat();
-	    m_preferences.put("gui-board-type", "Flat");
-	} else if (name.equals("Flat2")) {
-            if (m_mode != HEXBOARD)
-                initSize(HEXBOARD, m_width, m_height);
-	    m_drawer = new BoardDrawerFlat2();
-	    m_preferences.put("gui-board-type", "Flat2");
+	    m_drawer = new BoardDrawerHex();
+	    m_preferences.put("gui-board-type", "Hex");
 	} else {
 	    System.out.println("GuiBoard: unknown draw type '" + name + "'.");
-	    m_drawer = new BoardDrawerDiamond();
+	    m_drawer = new BoardDrawerHex();
 	} 
         repaint();
     }
@@ -175,6 +157,18 @@ public final class GuiBoard
 			       orient + "'.");
 	}
         repaint();
+    }
+
+    public void updateRotation(int amount)
+    {
+        int rot = m_preferences.getInt("gui-board-rotation");
+        rot = (rot + amount + 12) % 12;
+        m_preferences.put("gui-board-rotation", rot);
+    }
+
+    public void setRotation(int rot)
+    {
+        m_preferences.put("gui-board-rotation", rot);
     }
 
     public void initSize(int w, int h)
@@ -204,32 +198,22 @@ public final class GuiBoard
 
         if (m_mode == HEXBOARD) 
         {
-            m_field = new GuiField[w*h+4];
+            m_field = new GuiField[w*h];
             for (int x=0; x<w*h; x++) {
                 m_field[x] = new GuiField(HexPoint.get(x % w, x / w));
                 m_field[x].setAttributes(GuiField.DRAW_CELL_OUTLINE);
             }
-            m_field[w*h+0] = new GuiField(HexPoint.NORTH);
-            m_field[w*h+1] = new GuiField(HexPoint.SOUTH);
-            m_field[w*h+2] = new GuiField(HexPoint.WEST);
-            m_field[w*h+3] = new GuiField(HexPoint.EAST);
         } 
         else 
         {
             int n = w*(w+1)/2;
-            m_field = new GuiField[n+3];
+            m_field = new GuiField[n];
             for (int y=0,i=0; y<w; y++) {
                 for (int x=0; x<=y; x++,i++) {
                     m_field[i] = new GuiField(HexPoint.get(x, y));
                     m_field[i].setAttributes(GuiField.DRAW_CELL_OUTLINE);
                 }
             }
-            m_field[n+0] = new GuiField(HexPoint.SOUTH);
-            m_field[n+0].setAttributes(GuiField.DRAW_CELL_OUTLINE);
-            m_field[n+1] = new GuiField(HexPoint.WEST);
-            m_field[n+1].setAttributes(GuiField.DRAW_CELL_OUTLINE);
-            m_field[n+2] = new GuiField(HexPoint.EAST);
-            m_field[n+2].setAttributes(GuiField.DRAW_CELL_OUTLINE);
         }
 	clearAll();
         repaint();
@@ -266,20 +250,8 @@ public final class GuiBoard
     /** Clears all marks and stones from the board. */
     public void clearAll()
     {
-	for (int x=0; x<m_field.length; x++)
+	for (int x=0; x<m_field.length; x++) {
 	    m_field[x].clear();
-        if (m_mode == HEXBOARD) 
-        {
-            getField(HexPoint.NORTH).setColor(HexColor.BLACK);
-            getField(HexPoint.SOUTH).setColor(HexColor.BLACK);
-            getField(HexPoint.WEST).setColor(HexColor.WHITE);
-            getField(HexPoint.EAST).setColor(HexColor.WHITE);
-        } 
-        else 
-        {
-            getField(HexPoint.SOUTH).setColor(HexColor.EMPTY);
-            getField(HexPoint.WEST).setColor(HexColor.EMPTY);
-            getField(HexPoint.EAST).setColor(HexColor.EMPTY);
         }
         repaint();
     }
@@ -489,10 +461,6 @@ public final class GuiBoard
         int count = 0;
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             if (m_field[x].getColor() != HexColor.EMPTY) {
                 count++;
             }
@@ -507,10 +475,6 @@ public final class GuiBoard
     {
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             HexColor color = m_field[x].getColor();
             m_field[x].setColor(color.otherColor());
         }
@@ -527,18 +491,10 @@ public final class GuiBoard
         Map<HexPoint, HexColor> colors = new TreeMap<HexPoint, HexColor>();
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             colors.put(point, m_field[x].getColor());
         }
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST) {
-                continue;
-            }
             HexPoint otherpoint = point.reflect();
             m_field[x].setColor(colors.get(otherpoint).otherColor());
         }
@@ -550,10 +506,6 @@ public final class GuiBoard
     {
         for (int x=0; x<m_field.length; x++) {
             HexPoint point = m_field[x].getPoint();
-            if (point == HexPoint.NORTH || point == HexPoint.EAST ||
-                point == HexPoint.SOUTH || point == HexPoint.WEST)
-                continue;
-                
             HexColor color = m_field[x].getColor();
             if (color == HexColor.EMPTY)
                 continue;
@@ -668,17 +620,7 @@ public final class GuiBoard
 	for (int i=0; i<field.length; i++) {
 	    HexPoint p = field[i].getPoint();
 	    out[i] = new GuiField(field[i]);
-	    if (p == HexPoint.NORTH)
-		out[i].setPoint(HexPoint.WEST);
-	    else if (p == HexPoint.WEST)
-		out[i].setPoint(HexPoint.NORTH);
-	    else if (p == HexPoint.EAST)
-		out[i].setPoint(HexPoint.SOUTH);
-	    else if (p == HexPoint.SOUTH)
-		out[i].setPoint(HexPoint.EAST);
-	    else {
-		out[i].setPoint(HexPoint.get(p.y, p.x));
-	    }	    
+            out[i].setPoint(HexPoint.get(p.y, p.x));
 	}
 	return out;
     }
@@ -703,38 +645,17 @@ public final class GuiBoard
 	    int bw = m_width;
 	    int bh = m_height;
 	    GuiField ff[] = m_field;
-	    boolean alphaontop = true;
             Vector<Pair<HexPoint, HexPoint>> arrows = m_arrows;
 
-            boolean positive = true;
+            boolean mirrored = false;
             if (m_preferences.get("gui-board-orientation").equals("negative")) {
-                positive = false;
+                mirrored = true;
             }
-            boolean flip;
-            if (m_preferences.get("gui-board-type").equals("Flat2")) {
-                flip = positive;
-            } else {
-                flip = !positive;
-            }
+
+            int rotation = m_preferences.getInt("gui-board-rotation");
             
-	    if (flip) {
-		bw = m_height;
-		bh = m_width;
-		alphaontop = false;
-		ff = flipFields(m_field);
-
-                arrows = new Vector<Pair<HexPoint, HexPoint>>();
-                for (int i=0; i<m_arrows.size(); i++) {
-                    HexPoint p1 = m_arrows.get(i).first;
-                    HexPoint p2 = m_arrows.get(i).second;
-                    arrows.add(new Pair<HexPoint, HexPoint>
-                               (HexPoint.get(p1.y, p1.x),
-                                HexPoint.get(p2.y, p2.x)));
-                }
-	    }
-
-	    m_drawer.draw(m_image.getGraphics(), 
-                          w, h, bw, bh, alphaontop, 
+	    m_drawer.draw((Graphics2D)m_image.getGraphics(), 
+                          w, h, bw, bh, rotation, mirrored, 
                           ff, arrows);
 	    graphics.drawImage(m_image, 0, 0, null);
 	}

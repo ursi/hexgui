@@ -173,6 +173,14 @@ public final class HexGui
 	    cmdGuiBoardDrawType();
         } else if (cmd.equals("gui_board_orientation")) {
 	    cmdGuiBoardOrientation();
+        } else if (cmd.equals("gui-flat-orientation")) {
+	    cmdGuiBoardSetOrientation(10, false);
+        } else if (cmd.equals("gui-diamond-orientation")) {
+	    cmdGuiBoardSetOrientation(9, false);
+        } else if (cmd.equals("gui-rotate-left")) {
+	    cmdGuiBoardRotate(-1);
+        } else if (cmd.equals("gui-rotate-right")) {
+	    cmdGuiBoardRotate(1);
         } else if (cmd.equals("show-preferences")) {
             cmdShowPreferences();
         } else if (cmd.equals("gui-clear-marks")) {
@@ -859,6 +867,25 @@ public final class HexGui
 	m_guiboard.repaint();
     }
 
+    private void cmdGuiBoardSetOrientation(int rot, boolean mirrored)
+    {
+        if (!mirrored) {
+            m_menubar.setCurrentBoardOrientation("Positive");
+            m_guiboard.setOrientation("Positive");
+        } else {
+            m_menubar.setCurrentBoardOrientation("Negative");
+            m_guiboard.setOrientation("Negative");
+        }            
+	m_guiboard.setRotation(rot);
+	m_guiboard.repaint();
+    }
+
+    private void cmdGuiBoardRotate(int amount)
+    {
+	m_guiboard.updateRotation(amount);
+	m_guiboard.repaint();
+    }
+
     private void cmdClearMarks()
     {
         m_guiboard.clearMarks();
@@ -1362,7 +1389,7 @@ public final class HexGui
         {
 	    HexPoint point = HexPoint.get(pairs.get(i).first);
             String value = pairs.get(i).second;
-            float v = new Float(value).floatValue();
+            float v = Float.parseFloat(value);
             m_guiboard.setAlphaColor(point, new Color(0, v, 1-v), 0.7f);
 	}
         if (hasText)
